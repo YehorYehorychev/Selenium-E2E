@@ -1,0 +1,67 @@
+### Build ###
+target/
+build/
+out/
+bin/
+classes/
+
+### Maven Wrapper ###
+!.mvn/wrapper/maven-wrapper.jar
+
+### Maven generated reports ###
+/surefire-reports/
+/failsafe-reports/
+/jacoco/
+/*.log
+
+### Test Reports (Selenium / TestNG / Allure) ###
+allure-results/
+allure-report/
+allure-history/
+test-output/
+reports/
+screenshots/
+videos/
+logs/
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+*.iws
+*.ipr
+
+idea-shelf/
+.idea_modules/
+*.class
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+### VS Code ###
+.vscode/
+
+### OS Files ###
+.DS_Store
+Thumbs.db
+
+### Kotlin ###
+.kotlin
+
+### Local environment / temp ###
+.env
+*.tmp
+*.temp
+
+### Java ###
+hs_err_pid*
+replay_pid*
+
+### Selenium specific ###
+webdriver/
+drivers/
