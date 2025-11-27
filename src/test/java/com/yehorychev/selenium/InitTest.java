@@ -3,11 +3,15 @@ package com.yehorychev.selenium;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.time.Duration;
 import java.util.Objects;
 
 public class InitTest {
@@ -20,6 +24,7 @@ public class InitTest {
         options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         driver.get("https://www.google.com/");
 
         String pageTitle = driver.getTitle();
@@ -27,10 +32,19 @@ public class InitTest {
 
         System.out.printf("The page title is: %s, and the page base URL is: %s", pageTitle, pageUrl);
 
-        driver.findElement(By.xpath("//textarea[@class='gLFyf']")).click();
-        driver.findElement(By.xpath("//textarea[@class='gLFyf']")).sendKeys("Selenium");
-        driver.findElement(By.xpath("//textarea[@class='gLFyf']")).sendKeys(Keys.ENTER);
-        Assert.assertTrue(driver.findElement(By.xpath("(//span[contains(text(),'Selenium Test Automation')])[1]")).isDisplayed());
+        WebElement searchField = driver.findElement(By.xpath("//textarea[@class='gLFyf']"));
+        searchField.click();
+        searchField.sendKeys("Selenium");
+        searchField.sendKeys(Keys.ENTER);
+
+        WebElement searchOutput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("(//span[contains(text(),'Selenium')])[1]")
+                )
+        );
+
+        Assert.assertNotNull(searchOutput);
+        Assert.assertTrue(searchOutput.isDisplayed());
 
         driver.quit();
     }
