@@ -1,16 +1,51 @@
 package com.yehorychev.selenium;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
+import java.time.Duration;
+import java.util.Objects;
 
 public class InitTest {
-    public static void main(String[] args) throws InterruptedException {
 
-        WebDriver driver = new ChromeDriver();
-        driver.get("https://google.com");
-        Thread.sleep(2000);
+    @Test
+    void googleTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
 
-        System.out.println(driver.getTitle());
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        driver.get("https://www.google.com/");
+
+        String pageTitle = driver.getTitle();
+        String pageUrl = Objects.requireNonNull(driver.getCurrentUrl()).split("\\?")[0];
+
+        System.out.printf("The page title is: %s, and the page base URL is: %s", pageTitle, pageUrl);
+
+        WebElement searchField = driver.findElement(By.xpath("//textarea[@class='gLFyf']"));
+        searchField.click();
+        searchField.sendKeys("Selenium");
+        searchField.sendKeys(Keys.ENTER);
+
+        WebElement searchOutput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("(//cite[@role='text'])[1]")
+                )
+        );
+
+        Assert.assertNotNull(searchOutput);
+        Assert.assertTrue(searchOutput.isDisplayed());
+        System.out.println(System.lineSeparator() + searchOutput.getText());
 
         driver.quit();
     }
