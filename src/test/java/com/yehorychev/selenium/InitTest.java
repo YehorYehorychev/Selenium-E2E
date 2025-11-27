@@ -39,12 +39,13 @@ public class InitTest {
 
         WebElement searchOutput = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("(//span[contains(text(),'Selenium')])[1]")
+                        By.xpath("(//cite[@role='text'])[1]")
                 )
         );
 
         Assert.assertNotNull(searchOutput);
         Assert.assertTrue(searchOutput.isDisplayed());
+        System.out.println(System.lineSeparator() + searchOutput.getText());
 
         driver.quit();
     }
