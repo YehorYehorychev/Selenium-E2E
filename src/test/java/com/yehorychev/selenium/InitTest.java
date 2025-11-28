@@ -26,7 +26,7 @@ public class InitTest {
         WebDriver driver = new ChromeDriver(options);
         driver.manage().window().maximize();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        driver.navigate().to("https://www.google.com/");
+        driver.navigate().to(ConfigProperties.getGoogleUrl());
 
         String pageTitle = driver.getTitle();
         String pageUrl = Objects.requireNonNull(driver.getCurrentUrl()).split("\\?")[0];
