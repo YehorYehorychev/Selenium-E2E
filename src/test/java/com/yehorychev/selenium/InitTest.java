@@ -24,8 +24,9 @@ public class InitTest {
         options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = new ChromeDriver(options);
+        driver.manage().window().maximize();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        driver.get("https://www.google.com/");
+        driver.navigate().to("https://www.google.com/");
 
         String pageTitle = driver.getTitle();
         String pageUrl = Objects.requireNonNull(driver.getCurrentUrl()).split("\\?")[0];
