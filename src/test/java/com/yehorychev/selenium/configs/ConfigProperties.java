@@ -1,4 +1,4 @@
-package com.yehorychev.selenium;
+package com.yehorychev.selenium.configs;
 
 import java.io.IOException;
 import java.io.InputStream;
