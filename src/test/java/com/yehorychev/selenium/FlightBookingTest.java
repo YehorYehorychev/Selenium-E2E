@@ -68,61 +68,90 @@ public class FlightBookingTest {
             driver.navigate().to(ConfigProperties.getFlightBookingUrl());
 
             // Wait for and click the passengers info element to open the popup
-            By paxInfoLocator = By.id("divpaxinfo");
+            By paxInfoLocator = By.xpath("//div[@id='divpaxinfo']");
             WebElement paxInfo = wait.until(ExpectedConditions.elementToBeClickable(paxInfoLocator));
             paxInfo.click();
 
-            // Wait for and select 3 adults
-            By adultLocator = By.id("ctl00_mainContent_ddl_Adult");
-            WebElement adultSelectEl = wait.until(ExpectedConditions.visibilityOfElementLocated(adultLocator));
-            Select adultSelect = new Select(adultSelectEl);
-            adultSelect.selectByValue("3");
+            By adultPlusBtnLocator = By.xpath("//span[@id='hrefIncAdt']");
+            By childPlusBtnLocator = By.xpath("//span[@id='hrefIncChd']");
+            By doneBtnLocator = By.xpath("//input[@id='btnclosepaxoption']");
+            By passengersSelectedLocator = By.xpath("//div[@id='divpaxinfo']");
 
-            // Wait for and select 2 children
-            By childLocator = By.id("ctl00_mainContent_ddl_Child");
-            WebElement childSelectEl = wait.until(ExpectedConditions.visibilityOfElementLocated(childLocator));
-            Select childSelect = new Select(childSelectEl);
-            childSelect.selectByValue("2");
+            int adultsToAdd = 1; // 1 adult is selected by default, so add 1 more to get 2
+            int childrenToAdd = 2;
 
-            // Try clicking a Done button to close the popup
-            boolean doneClicked = false;
-            By[] doneLocators = new By[]{
-                    By.id("btnclosepaxoption"),
-                    By.xpath("//input[@value='Done']"),
-                    By.xpath("//button[text()='Done']"),
-                    By.xpath("//*[text()='Done']")
-            };
-
-            for (By loc : doneLocators) {
-                java.util.List<WebElement> elems = driver.findElements(loc);
-                if (!elems.isEmpty()) {
-                    for (WebElement el : elems) {
-                        try {
-                            if (el.isDisplayed()) {
-                                el.click();
-                                doneClicked = true;
-                                break;
-                            }
-                        } catch (Exception ignored) {
-                        }
-                    }
-                    if (doneClicked) break;
-                }
+            // Click adult plus button to add the required number of adults
+            WebElement adultPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(adultPlusBtnLocator));
+            for (int i = 0; i < adultsToAdd; i++) {
+                adultPlusBtn.click();
             }
 
-            if (!doneClicked) {
-                // Fallback: click the summary to close popup
-                paxInfo.click();
+            // Click child plus button to add the required number of children
+            WebElement childPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(childPlusBtnLocator));
+            for (int i = 0; i < childrenToAdd; i++) {
+                childPlusBtn.click();
             }
 
-            // Wait for and verify the passengers summary
-            WebElement paxSummary = wait.until(ExpectedConditions.visibilityOfElementLocated(paxInfoLocator));
-            String paxText = paxSummary.getText();
-            String lower = paxText.toLowerCase();
+            // Click the Done button
+            WebElement doneBtn = wait.until(ExpectedConditions.elementToBeClickable(doneBtnLocator));
+            doneBtn.click();
 
-            Assert.assertTrue(
-                    lower.contains("3") && lower.contains("adult") && lower.contains("2") && lower.contains("child"),
-                    "Passengers summary did not match expected counts. Actual: " + paxText);
+            // Wait for the popup to close and verify the selected passengers
+            WebElement passengersSelected = wait.until(ExpectedConditions.visibilityOfElementLocated(passengersSelectedLocator));
+            String passengersText = passengersSelected.getText();
+
+            // Assert that we have 2 adults and 2 children selected
+            Assert.assertTrue(passengersText.contains("2 Adult") && passengersText.contains("2 Child"),
+                    "Expected '2 Adult, 2 Child' but got: " + passengersText);
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    void flightBookingFromToCitiesTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getFlightBookingUrl());
+
+            By departureWindowLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_originStation1_CTXT']");
+            By departureCityLocator = By.xpath("//a[@value='GOI']");
+
+            // Click the departure window to open the dropdown
+            WebElement departureWindow = wait.until(ExpectedConditions.elementToBeClickable(departureWindowLocator));
+            departureWindow.click();
+
+            // Wait for the city option to appear and be clickable
+            WebElement departureCity = wait.until(ExpectedConditions.elementToBeClickable(departureCityLocator));
+            departureCity.click();
+
+            By arrivalWindowLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_destinationStation1_CTXT']");
+            By arrivalCityLocator = By.xpath("//a[@value='BLR']");
+
+            // Click the arrival window to open the dropdown
+            WebElement arrivalWindow = wait.until(ExpectedConditions.elementToBeClickable(arrivalWindowLocator));
+            arrivalWindow.click();
+
+            // Wait for the city option to appear and be clickable
+            WebElement arrivalCity = wait.until(ExpectedConditions.elementToBeClickable(arrivalCityLocator));
+            arrivalCity.click();
+
+            By selectedDepartureCityLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_originStation1_CTXT']");
+            By selectedArrivalCityLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_destinationStation1_CTXT']");
+
+            WebElement selectedDepartureCity = wait.until(ExpectedConditions.visibilityOfElementLocated(selectedDepartureCityLocator));
+            WebElement selectedArrivalCity = wait.until(ExpectedConditions.visibilityOfElementLocated(selectedArrivalCityLocator));
+
+            Assert.assertEquals(selectedDepartureCity.getAttribute("value"), "Goa (GOI)");
+            Assert.assertEquals(selectedArrivalCity.getAttribute("value"), "Bengaluru (BLR)");
         } finally {
             driver.quit();
         }
