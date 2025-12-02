@@ -73,20 +73,24 @@ public class FlightBookingTest {
             paxInfo.click();
 
             By adultPlusBtnLocator = By.xpath("//span[@id='hrefIncAdt']");
-
             By childPlusBtnLocator = By.xpath("//span[@id='hrefIncChd']");
-
             By doneBtnLocator = By.xpath("//input[@id='btnclosepaxoption']");
             By passengersSelectedLocator = By.xpath("//div[@id='divpaxinfo']");
 
-            // Click adult plus button just once to select 2 adults (1 adult is selected by default)
-            WebElement adultPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(adultPlusBtnLocator));
-            adultPlusBtn.click();
+            int adultsToAdd = 1; // 1 adult is selected by default, so add 1 more to get 2
+            int childrenToAdd = 2;
 
-            // Click child plus button twice to select 2 children
+            // Click adult plus button to add the required number of adults
+            WebElement adultPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(adultPlusBtnLocator));
+            for (int i = 0; i < adultsToAdd; i++) {
+                adultPlusBtn.click();
+            }
+
+            // Click child plus button to add the required number of children
             WebElement childPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(childPlusBtnLocator));
-            childPlusBtn.click();
-            childPlusBtn.click();
+            for (int i = 0; i < childrenToAdd; i++) {
+                childPlusBtn.click();
+            }
 
             // Click the Done button
             WebElement doneBtn = wait.until(ExpectedConditions.elementToBeClickable(doneBtnLocator));
@@ -99,6 +103,55 @@ public class FlightBookingTest {
             // Assert that we have 2 adults and 2 children selected
             Assert.assertTrue(passengersText.contains("2 Adult") && passengersText.contains("2 Child"),
                     "Expected '2 Adult, 2 Child' but got: " + passengersText);
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    void flightBookingFromToCitiesTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getFlightBookingUrl());
+
+            By departureWindowLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_originStation1_CTXT']");
+            By departureCityLocator = By.xpath("//a[@value='GOI']");
+
+            // Click the departure window to open the dropdown
+            WebElement departureWindow = wait.until(ExpectedConditions.elementToBeClickable(departureWindowLocator));
+            departureWindow.click();
+
+            // Wait for the city option to appear and be clickable
+            WebElement departureCity = wait.until(ExpectedConditions.elementToBeClickable(departureCityLocator));
+            departureCity.click();
+
+            By arrivalWindowLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_destinationStation1_CTXT']");
+            By arrivalCityLocator = By.xpath("//a[@value='BLR']");
+
+            // Click the arrival window to open the dropdown
+            WebElement arrivalWindow = wait.until(ExpectedConditions.elementToBeClickable(arrivalWindowLocator));
+            arrivalWindow.click();
+
+            // Wait for the city option to appear and be clickable
+            WebElement arrivalCity = wait.until(ExpectedConditions.elementToBeClickable(arrivalCityLocator));
+            arrivalCity.click();
+
+            By selectedDepartureCityLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_originStation1_CTXT']");
+            By selectedArrivalCityLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_destinationStation1_CTXT']");
+
+            WebElement selectedDepartureCity = wait.until(ExpectedConditions.visibilityOfElementLocated(selectedDepartureCityLocator));
+            WebElement selectedArrivalCity = wait.until(ExpectedConditions.visibilityOfElementLocated(selectedArrivalCityLocator));
+
+            Assert.assertEquals(selectedDepartureCity.getAttribute("value"), "Goa (GOI)");
+            Assert.assertEquals(selectedArrivalCity.getAttribute("value"), "Bengaluru (BLR)");
         } finally {
             driver.quit();
         }
