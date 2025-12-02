@@ -68,61 +68,37 @@ public class FlightBookingTest {
             driver.navigate().to(ConfigProperties.getFlightBookingUrl());
 
             // Wait for and click the passengers info element to open the popup
-            By paxInfoLocator = By.id("divpaxinfo");
+            By paxInfoLocator = By.xpath("//div[@id='divpaxinfo']");
             WebElement paxInfo = wait.until(ExpectedConditions.elementToBeClickable(paxInfoLocator));
             paxInfo.click();
 
-            // Wait for and select 3 adults
-            By adultLocator = By.id("ctl00_mainContent_ddl_Adult");
-            WebElement adultSelectEl = wait.until(ExpectedConditions.visibilityOfElementLocated(adultLocator));
-            Select adultSelect = new Select(adultSelectEl);
-            adultSelect.selectByValue("3");
+            By adultPlusBtnLocator = By.xpath("//span[@id='hrefIncAdt']");
 
-            // Wait for and select 2 children
-            By childLocator = By.id("ctl00_mainContent_ddl_Child");
-            WebElement childSelectEl = wait.until(ExpectedConditions.visibilityOfElementLocated(childLocator));
-            Select childSelect = new Select(childSelectEl);
-            childSelect.selectByValue("2");
+            By childPlusBtnLocator = By.xpath("//span[@id='hrefIncChd']");
 
-            // Try clicking a Done button to close the popup
-            boolean doneClicked = false;
-            By[] doneLocators = new By[]{
-                    By.id("btnclosepaxoption"),
-                    By.xpath("//input[@value='Done']"),
-                    By.xpath("//button[text()='Done']"),
-                    By.xpath("//*[text()='Done']")
-            };
+            By doneBtnLocator = By.xpath("//input[@id='btnclosepaxoption']");
+            By passengersSelectedLocator = By.xpath("//div[@id='divpaxinfo']");
 
-            for (By loc : doneLocators) {
-                java.util.List<WebElement> elems = driver.findElements(loc);
-                if (!elems.isEmpty()) {
-                    for (WebElement el : elems) {
-                        try {
-                            if (el.isDisplayed()) {
-                                el.click();
-                                doneClicked = true;
-                                break;
-                            }
-                        } catch (Exception ignored) {
-                        }
-                    }
-                    if (doneClicked) break;
-                }
-            }
+            // Click adult plus button just once to select 2 adults (1 adult is selected by default)
+            WebElement adultPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(adultPlusBtnLocator));
+            adultPlusBtn.click();
 
-            if (!doneClicked) {
-                // Fallback: click the summary to close popup
-                paxInfo.click();
-            }
+            // Click child plus button twice to select 2 children
+            WebElement childPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(childPlusBtnLocator));
+            childPlusBtn.click();
+            childPlusBtn.click();
 
-            // Wait for and verify the passengers summary
-            WebElement paxSummary = wait.until(ExpectedConditions.visibilityOfElementLocated(paxInfoLocator));
-            String paxText = paxSummary.getText();
-            String lower = paxText.toLowerCase();
+            // Click the Done button
+            WebElement doneBtn = wait.until(ExpectedConditions.elementToBeClickable(doneBtnLocator));
+            doneBtn.click();
 
-            Assert.assertTrue(
-                    lower.contains("3") && lower.contains("adult") && lower.contains("2") && lower.contains("child"),
-                    "Passengers summary did not match expected counts. Actual: " + paxText);
+            // Wait for the popup to close and verify the selected passengers
+            WebElement passengersSelected = wait.until(ExpectedConditions.visibilityOfElementLocated(passengersSelectedLocator));
+            String passengersText = passengersSelected.getText();
+
+            // Assert that we have 2 adults and 2 children selected
+            Assert.assertTrue(passengersText.contains("2 Adult") && passengersText.contains("2 Child"),
+                    "Expected '2 Adult, 2 Child' but got: " + passengersText);
         } finally {
             driver.quit();
         }
