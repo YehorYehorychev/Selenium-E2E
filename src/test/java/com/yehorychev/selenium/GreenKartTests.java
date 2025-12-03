@@ -12,7 +12,6 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
-import java.util.List;
 
 public class GreenKartTests {
 
@@ -30,22 +29,18 @@ public class GreenKartTests {
             driver.manage().window().maximize();
             driver.navigate().to(ConfigProperties.getGreenKartUrl());
 
-            String[] productNames = {"Brocolli", "Cauliflower", "Cucumber"};
-            List<WebElement> products = driver.findElements(By.cssSelector("h4.product-name"));
+            String[] veggiesToAdd = {"Cucumber", "Brocolli", "Beetroot"};
 
-            // Add "Cucumber" to the cart
-            for (int i = 0; i < products.size(); i++) {
-                String name = products.get(i).getText();
-                if (name.contains("Cucumber")) {
-                    driver.findElements(By.xpath("//button[text()='ADD TO CART']")).get(i).click();
-                    break;
-                }
+            // Add all three vegetables to the cart
+            for (String veggie : veggiesToAdd) {
+                WebElement addToCartButton = driver.findElement(By.xpath("//h4[contains(text(), '" + veggie + "')]/following::button[text()='ADD TO CART']"));
+                addToCartButton.click();
             }
 
-            // Verify that the item was added to the cart
-            By itemsInCartLocator = By.xpath("//strong[normalize-space()='1']");
+            // Verify that all 3 items were added to the cart
+            By itemsInCartLocator = By.xpath("//strong[normalize-space()='3']");
             WebElement itemsInCart = wait.until(ExpectedConditions.visibilityOfElementLocated(itemsInCartLocator));
-            Assert.assertEquals(itemsInCart.getText(), "1", "Item was not added to the cart.");
+            Assert.assertEquals(itemsInCart.getText().trim(), "3", "All 3 items were not added to the cart.");
         } finally {
             driver.quit();
         }
