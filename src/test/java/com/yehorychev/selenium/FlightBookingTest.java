@@ -13,6 +13,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 
 public class FlightBookingTest {
@@ -152,6 +153,46 @@ public class FlightBookingTest {
 
             Assert.assertEquals(selectedDepartureCity.getAttribute("value"), "Goa (GOI)");
             Assert.assertEquals(selectedArrivalCity.getAttribute("value"), "Bengaluru (BLR)");
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    void flightBookingDynamicDropdownTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getFlightBookingUrl());
+
+            By searchBarLocator = By.xpath("//input[@id='autosuggest']");
+            By suggestionsLocator = By.xpath("//li[@class='ui-menu-item']/a");
+            String countryToSearch = "Br"; // Partial country name to trigger dynamic dropdown Virgin Islands (British)
+
+            // Click the search bar and type the country
+            WebElement searchBar = wait.until(ExpectedConditions.elementToBeClickable(searchBarLocator));
+            searchBar.sendKeys(countryToSearch);
+
+            // Wait for suggestions to be loaded and visible
+            wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(suggestionsLocator));
+
+            // Find and click the matching country from the suggestions
+            List<WebElement> suggestedCountries = driver.findElements(suggestionsLocator);
+            suggestedCountries.stream()
+                    .filter(webElement -> webElement.getText().equalsIgnoreCase("Virgin Islands (British)"))
+                    .findFirst()
+                    .ifPresent(WebElement::click);
+
+            // Verify the selected country
+            String selectedCountry = searchBar.getAttribute("value");
+            Assert.assertEquals(selectedCountry, "Virgin Islands (British)");
         } finally {
             driver.quit();
         }
