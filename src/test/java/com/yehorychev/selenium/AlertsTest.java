@@ -1,6 +1,6 @@
 package com.yehorychev.selenium;
 
-import com.yehorychev.selenium.configs.ConfigProperties;
+import com.yehorychev.selenium.config.ConfigProperties;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -47,9 +47,9 @@ public class AlertsTest {
             driver.switchTo().alert().dismiss();
 
             // Verify alert is dismissed
-            wait.until(driver1 -> {
+            wait.until(d -> {
                 try {
-                    driver1.switchTo().alert();
+                    d.switchTo().alert();
                     return false; // Alert is still present
                 } catch (Exception e) {
                     return true; // Alert is dismissed

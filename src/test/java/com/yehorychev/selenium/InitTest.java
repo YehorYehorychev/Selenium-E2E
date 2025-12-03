@@ -1,6 +1,6 @@
 package com.yehorychev.selenium;
 
-import com.yehorychev.selenium.configs.ConfigProperties;
+import com.yehorychev.selenium.config.ConfigProperties;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
