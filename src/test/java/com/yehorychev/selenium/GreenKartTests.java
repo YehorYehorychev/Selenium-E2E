@@ -12,6 +12,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.List;
 
 public class GreenKartTests {
 
@@ -41,6 +42,28 @@ public class GreenKartTests {
             By itemsInCartLocator = By.xpath("//strong[normalize-space()='3']");
             WebElement itemsInCart = wait.until(ExpectedConditions.visibilityOfElementLocated(itemsInCartLocator));
             Assert.assertEquals(itemsInCart.getText().trim(), "3", "All 3 items were not added to the cart.");
+
+            // Click on the cart icon to view the cart
+            By cartIconLocator = By.cssSelector(".cart-icon");
+            WebElement cartIcon = wait.until(ExpectedConditions.elementToBeClickable(cartIconLocator));
+            cartIcon.click();
+
+            // Click on the "PROCEED TO CHECKOUT" button
+            By proceedToCheckoutLocator = By.xpath("//button[normalize-space()='PROCEED TO CHECKOUT']");
+            WebElement proceedToCheckoutButton = wait.until(ExpectedConditions.elementToBeClickable(proceedToCheckoutLocator));
+            proceedToCheckoutButton.click();
+
+            List<WebElement> productNames = driver.findElements(By.xpath("//p[@class='product-name']"));
+
+            // Verify that 3 products are displayed
+            Assert.assertEquals(productNames.size(), 3, "Expected 3 products in the cart");
+
+            // Verify the product names match the expected values
+            String[] expectedProductNames = {"Broccoli - 1 Kg", "Cauliflower - 1 Kg", "Cucumber - 1 Kg"};
+            for (int i = 0; i < expectedProductNames.length; i++) {
+                Assert.assertEquals(productNames.get(i).getText().trim(), expectedProductNames[i],
+                        "Product name at index " + i + " does not match");
+            }
         } finally {
             driver.quit();
         }
