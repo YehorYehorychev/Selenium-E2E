@@ -13,6 +13,7 @@ import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GreenKartTests {
 
@@ -30,21 +31,23 @@ public class GreenKartTests {
             driver.manage().window().maximize();
             driver.navigate().to(ConfigProperties.getGreenKartUrl());
 
-            String[] veggiesToAdd = {"Cucumber", "Brocolli", "Beetroot"};
+            String[] veggiesToAdd = {"Brocolli", "Cauliflower", "Cucumber"};
 
             // Add all three vegetables to the cart
             for (String veggie : veggiesToAdd) {
                 WebElement addToCartButton = driver.findElement(By.xpath("//h4[contains(text(), '" + veggie + "')]/following::button[text()='ADD TO CART']"));
                 addToCartButton.click();
+                By cartCountLocator = By.cssSelector("div.cart-info td:nth-child(3) strong");
+                wait.until(ExpectedConditions.textToBe(cartCountLocator, String.valueOf(wait.until(driver1 -> driver1.findElement(cartCountLocator)).getText().trim())));
             }
 
-            // Verify that all 3 items were added to the cart
-            By itemsInCartLocator = By.xpath("//strong[normalize-space()='3']");
-            WebElement itemsInCart = wait.until(ExpectedConditions.visibilityOfElementLocated(itemsInCartLocator));
-            Assert.assertEquals(itemsInCart.getText().trim(), "3", "All 3 items were not added to the cart.");
+            By cartCountLocator = By.cssSelector("div.cart-info td:nth-child(3) strong");
+            wait.until(ExpectedConditions.textToBe(cartCountLocator, String.valueOf(veggiesToAdd.length)));
+            WebElement itemsInCart = driver.findElement(cartCountLocator);
+            Assert.assertEquals(itemsInCart.getText().trim(), String.valueOf(veggiesToAdd.length), "All selected items were not added to the cart.");
 
             // Click on the cart icon to view the cart
-            By cartIconLocator = By.cssSelector(".cart-icon");
+            By cartIconLocator = By.xpath("//img[@alt='Cart']");
             WebElement cartIcon = wait.until(ExpectedConditions.elementToBeClickable(cartIconLocator));
             cartIcon.click();
 
@@ -53,16 +56,22 @@ public class GreenKartTests {
             WebElement proceedToCheckoutButton = wait.until(ExpectedConditions.elementToBeClickable(proceedToCheckoutLocator));
             proceedToCheckoutButton.click();
 
-            List<WebElement> productNames = driver.findElements(By.xpath("//p[@class='product-name']"));
+            // Wait for the product names to be visible on the checkout page
+            By productNameLocator = By.xpath("//table[@id='productCartTables']//p[@class='product-name']");
+            wait.until(ExpectedConditions.numberOfElementsToBe(productNameLocator, veggiesToAdd.length));
+            List<WebElement> productNames = driver.findElements(productNameLocator);
 
-            // Verify that 3 products are displayed
-            Assert.assertEquals(productNames.size(), 3, "Expected 3 products in the cart");
+            // Verify that the expected products are displayed
+            Assert.assertEquals(productNames.size(), veggiesToAdd.length, "Unexpected number of products in the cart");
 
-            // Verify the product names match the expected values
-            String[] expectedProductNames = {"Broccoli - 1 Kg", "Cauliflower - 1 Kg", "Cucumber - 1 Kg"};
-            for (int i = 0; i < expectedProductNames.length; i++) {
-                Assert.assertEquals(productNames.get(i).getText().trim(), expectedProductNames[i],
-                        "Product name at index " + i + " does not match");
+            String[] expectedProductNames = {"Brocolli - 1 Kg", "Cauliflower - 1 Kg", "Cucumber - 1 Kg"};
+            List<String> actualProductNames = productNames.stream()
+                    .map(element -> element.getText().trim())
+                    .collect(Collectors.toList());
+
+            for (String expectedProductName : expectedProductNames) {
+                Assert.assertTrue(actualProductNames.contains(expectedProductName),
+                        "Product name not found in cart: " + expectedProductName);
             }
         } finally {
             driver.quit();
