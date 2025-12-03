@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.configs;
+package com.yehorychev.selenium.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +26,7 @@ public class ConfigProperties {
 
     /**
      * Get the base URL for Google
+     *
      * @return Google base URL
      */
     public static String getGoogleUrl() {
@@ -34,6 +35,7 @@ public class ConfigProperties {
 
     /**
      * Get the base URL for Flight Booking
+     *
      * @return Flight booking base URL
      */
     public static String getFlightBookingUrl() {
@@ -41,7 +43,26 @@ public class ConfigProperties {
     }
 
     /**
+     * Get the base URL for Practice Page
+     *
+     * @return Practice Page base URL
+     */
+    public static String getPracticePageUrl() {
+        return getProperty("base.url.practice.page");
+    }
+
+    /**
+     * Get the base URL for Green Kart
+     *
+     * @return Green Kart base URL
+     */
+    public static String getGreenKartUrl() {
+        return getProperty("base.url.green.kart");
+    }
+
+    /**
      * Generic method to get any property value
+     *
      * @param key the property key
      * @return the property value
      */
