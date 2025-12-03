@@ -16,7 +16,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
-public class FlightBookingTest {
+public class FlightBookingTests {
 
     @Test
     void flightBookingTest() {
