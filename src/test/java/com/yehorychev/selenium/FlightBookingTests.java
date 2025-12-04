@@ -1,14 +1,13 @@
 package com.yehorychev.selenium;
 
 import com.yehorychev.selenium.config.ConfigProperties;
+import com.yehorychev.selenium.waits.WaitHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -26,22 +25,19 @@ public class FlightBookingTests {
         options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = new ChromeDriver(options);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(10));
 
         try {
             driver.manage().window().maximize();
             driver.navigate().to(ConfigProperties.getFlightBookingUrl());
 
-            // Wait for the currency dropdown to be visible
             By currencyLocator = By.id("ctl00_mainContent_DropDownListCurrency");
-            WebElement staticDropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(currencyLocator));
+            WebElement staticDropdown = waitHelper.visibilityOf(currencyLocator);
 
-            // Select USD by visible text
             Select dropdown = new Select(staticDropdown);
             dropdown.selectByVisibleText("USD");
 
-            // Wait until the selected option text is "USD"
-            wait.until(__ -> "USD".equals(dropdown.getFirstSelectedOption().getText()));
+            waitHelper.until(__ -> "USD".equals(dropdown.getFirstSelectedOption().getText()));
 
             // Verify page details
             String pageTitle = driver.getTitle();
@@ -62,15 +58,14 @@ public class FlightBookingTests {
         options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = new ChromeDriver(options);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
 
         try {
             driver.manage().window().maximize();
             driver.navigate().to(ConfigProperties.getFlightBookingUrl());
 
-            // Wait for and click the passengers info element to open the popup
             By paxInfoLocator = By.xpath("//div[@id='divpaxinfo']");
-            WebElement paxInfo = wait.until(ExpectedConditions.elementToBeClickable(paxInfoLocator));
+            WebElement paxInfo = waitHelper.elementToBeClickable(paxInfoLocator);
             paxInfo.click();
 
             By adultPlusBtnLocator = By.xpath("//span[@id='hrefIncAdt']");
@@ -82,23 +77,23 @@ public class FlightBookingTests {
             int childrenToAdd = 2;
 
             // Click adult plus button to add the required number of adults
-            WebElement adultPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(adultPlusBtnLocator));
+            WebElement adultPlusBtn = waitHelper.elementToBeClickable(adultPlusBtnLocator);
             for (int i = 0; i < adultsToAdd; i++) {
                 adultPlusBtn.click();
             }
 
             // Click child plus button to add the required number of children
-            WebElement childPlusBtn = wait.until(ExpectedConditions.elementToBeClickable(childPlusBtnLocator));
+            WebElement childPlusBtn = waitHelper.elementToBeClickable(childPlusBtnLocator);
             for (int i = 0; i < childrenToAdd; i++) {
                 childPlusBtn.click();
             }
 
             // Click the Done button
-            WebElement doneBtn = wait.until(ExpectedConditions.elementToBeClickable(doneBtnLocator));
+            WebElement doneBtn = waitHelper.elementToBeClickable(doneBtnLocator);
             doneBtn.click();
 
             // Wait for the popup to close and verify the selected passengers
-            WebElement passengersSelected = wait.until(ExpectedConditions.visibilityOfElementLocated(passengersSelectedLocator));
+            WebElement passengersSelected = waitHelper.visibilityOf(passengersSelectedLocator);
             String passengersText = passengersSelected.getText();
 
             // Assert that we have 2 adults and 2 children selected
@@ -117,7 +112,7 @@ public class FlightBookingTests {
         options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = new ChromeDriver(options);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
 
         try {
             driver.manage().window().maximize();
@@ -127,29 +122,29 @@ public class FlightBookingTests {
             By departureCityLocator = By.xpath("//a[@value='GOI']");
 
             // Click the departure window to open the dropdown
-            WebElement departureWindow = wait.until(ExpectedConditions.elementToBeClickable(departureWindowLocator));
+            WebElement departureWindow = waitHelper.elementToBeClickable(departureWindowLocator);
             departureWindow.click();
 
             // Wait for the city option to appear and be clickable
-            WebElement departureCity = wait.until(ExpectedConditions.elementToBeClickable(departureCityLocator));
+            WebElement departureCity = waitHelper.elementToBeClickable(departureCityLocator);
             departureCity.click();
 
             By arrivalWindowLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_destinationStation1_CTXT']");
             By arrivalCityLocator = By.xpath("//a[@value='BLR']");
 
             // Click the arrival window to open the dropdown
-            WebElement arrivalWindow = wait.until(ExpectedConditions.elementToBeClickable(arrivalWindowLocator));
+            WebElement arrivalWindow = waitHelper.elementToBeClickable(arrivalWindowLocator);
             arrivalWindow.click();
 
             // Wait for the city option to appear and be clickable
-            WebElement arrivalCity = wait.until(ExpectedConditions.elementToBeClickable(arrivalCityLocator));
+            WebElement arrivalCity = waitHelper.elementToBeClickable(arrivalCityLocator);
             arrivalCity.click();
 
             By selectedDepartureCityLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_originStation1_CTXT']");
             By selectedArrivalCityLocator = By.xpath("//input[@id='ctl00_mainContent_ddl_destinationStation1_CTXT']");
 
-            WebElement selectedDepartureCity = wait.until(ExpectedConditions.visibilityOfElementLocated(selectedDepartureCityLocator));
-            WebElement selectedArrivalCity = wait.until(ExpectedConditions.visibilityOfElementLocated(selectedArrivalCityLocator));
+            WebElement selectedDepartureCity = waitHelper.visibilityOf(selectedDepartureCityLocator);
+            WebElement selectedArrivalCity = waitHelper.visibilityOf(selectedArrivalCityLocator);
 
             Assert.assertEquals(selectedDepartureCity.getAttribute("value"), "Goa (GOI)");
             Assert.assertEquals(selectedArrivalCity.getAttribute("value"), "Bengaluru (BLR)");
@@ -166,7 +161,7 @@ public class FlightBookingTests {
         options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = new ChromeDriver(options);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
 
         try {
             driver.manage().window().maximize();
@@ -177,11 +172,11 @@ public class FlightBookingTests {
             String countryToSearch = "Br"; // Partial country name to trigger dynamic dropdown Virgin Islands (British)
 
             // Click the search bar and type the country
-            WebElement searchBar = wait.until(ExpectedConditions.elementToBeClickable(searchBarLocator));
+            WebElement searchBar = waitHelper.elementToBeClickable(searchBarLocator);
             searchBar.sendKeys(countryToSearch);
 
             // Wait for suggestions to be loaded and visible
-            wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(suggestionsLocator));
+            waitHelper.visibilityOfAllElements(suggestionsLocator);
 
             // Find and click the matching country from the suggestions
             List<WebElement> suggestedCountries = driver.findElements(suggestionsLocator);
