@@ -13,7 +13,9 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public class AmazonTests {
 
@@ -67,11 +69,16 @@ public class AmazonTests {
     void amazonActionsTest() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--remote-allow-origins=*");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
         options.setExperimentalOption("useAutomationExtension", false);
+        options.addArguments("--disable-features=OptimizationGuideModelDownloading");
 
         WebDriver driver = new ChromeDriver(options);
-        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(10));
 
         try {
             driver.manage().window().maximize();
@@ -95,6 +102,52 @@ public class AmazonTests {
             WebElement signInHeader = waitHelper.visibilityOf(signInHeaderLocator);
 
             Assert.assertTrue(signInHeader.isDisplayed());
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    void amazonCartInNewWindowTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-popup-blocking");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--remote-allow-origins=*");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+        options.addArguments("--disable-features=OptimizationGuideModelDownloading");
+
+        WebDriver driver = new ChromeDriver(options);
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(10));
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getAmazonUrl());
+            Actions actions = new Actions(driver);
+
+            By cartLocator = By.cssSelector(".nav-cart-icon.nav-sprite");
+            WebElement cart = waitHelper.elementToBeClickable(cartLocator);
+            actions.keyDown(Keys.COMMAND).moveToElement(cart).click().build().perform();
+
+            // Switch to new window
+            Set<String> windows = driver.getWindowHandles();
+            Iterator<String> iterator = windows.iterator();
+            String parentWindow = iterator.next();
+            String childWindow = iterator.next();
+
+            driver.switchTo().window(childWindow);
+
+            By cartHeaderLocator = By.cssSelector(".a-size-large.a-spacing-top-base.sc-your-amazon-cart-is-empty");
+            WebElement cartHeader = waitHelper.visibilityOf(cartHeaderLocator);
+            Assert.assertTrue(cartHeader.isDisplayed());
+
+            driver.switchTo().window(parentWindow);
+
+            By parentWindowUpdateLocationLocator = By.xpath("//h2[normalize-space()='Shop gifts by category']");
+            WebElement parentWindowElement = waitHelper.visibilityOf(parentWindowUpdateLocationLocator);
+            Assert.assertTrue(parentWindowElement.isDisplayed());
         } finally {
             driver.quit();
         }
