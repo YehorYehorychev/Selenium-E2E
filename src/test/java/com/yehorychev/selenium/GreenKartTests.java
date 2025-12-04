@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class GreenKartTests {
 
     @Test
-    void addItemToCartTest() {
+    void addItemToCartAndApplyPromoCodeTest() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
@@ -73,6 +73,21 @@ public class GreenKartTests {
                 Assert.assertTrue(actualProductNames.contains(expectedProductName),
                         "Product name not found in cart: " + expectedProductName);
             }
+
+            // Apply promo code
+            By promoCodeFieldLocator = By.xpath("//input[@placeholder='Enter promo code']");
+            WebElement promoCodeField = wait.until(ExpectedConditions.visibilityOfElementLocated(promoCodeFieldLocator));
+            promoCodeField.sendKeys("rahulshettyacademy");
+
+            // Click on the "Apply" button
+            By applyButtonLocator = By.xpath("//button[text()='Apply']");
+            WebElement applyButton = wait.until(ExpectedConditions.elementToBeClickable(applyButtonLocator));
+            applyButton.click();
+
+            // Verify that the promo code was applied successfully
+            By promoInfoLocator = By.cssSelector(".promoInfo");
+            WebElement promoInfo = wait.until(ExpectedConditions.visibilityOfElementLocated(promoInfoLocator));
+            Assert.assertEquals(promoInfo.getText().trim(), "Code applied ..!", "Promo code was not applied successfully.");
         } finally {
             driver.quit();
         }
