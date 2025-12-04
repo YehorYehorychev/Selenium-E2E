@@ -61,6 +61,15 @@ public class ConfigProperties {
     }
 
     /**
+     * Get the base URL for Amazon
+     *
+     * @return Amazon base URL
+     */
+    public static String getAmazonUrl() {
+        return getProperty("base.url.amazon");
+    }
+
+    /**
      * Generic method to get any property value
      *
      * @param key the property key
@@ -74,4 +83,3 @@ public class ConfigProperties {
         return value;
     }
 }
-
