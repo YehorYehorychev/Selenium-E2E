@@ -8,6 +8,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.time.Duration;
@@ -33,6 +34,15 @@ public class AmazonTests {
             WebElement accountsAndLists = waitHelper.visibilityOf(accountsAndListsLocator);
 
             actions.moveToElement(accountsAndLists).build().perform();
+
+            By watchlistLocator = By.xpath("//span[normalize-space()='Watchlist']");
+            WebElement watchlist = waitHelper.elementToBeClickable(watchlistLocator);
+            watchlist.click();
+
+            By signInHeaderLocator = By.xpath("//h1[normalize-space()='Sign in or create account']");
+            WebElement signInHeader = waitHelper.visibilityOf(signInHeaderLocator);
+
+            Assert.assertTrue(signInHeader.isDisplayed());
         } finally {
             driver.quit();
         }
