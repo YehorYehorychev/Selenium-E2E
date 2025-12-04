@@ -1,13 +1,12 @@
 package com.yehorychev.selenium;
 
 import com.yehorychev.selenium.config.ConfigProperties;
+import com.yehorychev.selenium.waits.WaitHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -23,7 +22,7 @@ public class AlertsTest {
         options.setExperimentalOption("useAutomationExtension", false);
 
         WebDriver driver = new ChromeDriver(options);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
 
         try {
             driver.manage().window().maximize();
@@ -32,22 +31,21 @@ public class AlertsTest {
             By nameFieldLocator = By.xpath("//input[@id='name']");
             By confirmBtnLocator = By.xpath("//input[@id='confirmbtn']");
 
-            WebElement nameField = wait.until(ExpectedConditions.elementToBeClickable(nameFieldLocator));
+            WebElement nameField = waitHelper.elementToBeClickable(nameFieldLocator);
             nameField.sendKeys("Yehor");
 
-            WebElement confirmBtn = wait.until(ExpectedConditions.elementToBeClickable(confirmBtnLocator));
+            WebElement confirmBtn = waitHelper.elementToBeClickable(confirmBtnLocator);
             confirmBtn.click();
 
             // Assert that alert is present
-            wait.until(ExpectedConditions.alertIsPresent());
-            String alertText = driver.switchTo().alert().getText();
+            String alertText = waitHelper.alertIsPresent().getText();
             Assert.assertEquals(alertText, "Hello Yehor, Are you sure you want to confirm?");
 
             // Dismiss the alert
             driver.switchTo().alert().dismiss();
 
             // Verify alert is dismissed
-            wait.until(d -> {
+            waitHelper.until(d -> {
                 try {
                     d.switchTo().alert();
                     return false; // Alert is still present

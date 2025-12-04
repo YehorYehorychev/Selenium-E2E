@@ -1,14 +1,13 @@
 package com.yehorychev.selenium;
 
 import com.yehorychev.selenium.config.ConfigProperties;
+import com.yehorychev.selenium.waits.WaitHelper;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -26,7 +25,7 @@ public class InitTest {
 
         WebDriver driver = new ChromeDriver(options);
         driver.manage().window().maximize();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
         driver.navigate().to(ConfigProperties.getGoogleUrl());
 
         String pageTitle = driver.getTitle();
@@ -39,10 +38,8 @@ public class InitTest {
         searchField.sendKeys("Selenium");
         searchField.sendKeys(Keys.ENTER);
 
-        WebElement searchOutput = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("(//cite[@role='text'])[1]")
-                )
+        WebElement searchOutput = waitHelper.visibilityOf(
+                By.xpath("(//cite[@role='text'])[1]")
         );
 
         Assert.assertNotNull(searchOutput);
