@@ -3,6 +3,7 @@ package com.yehorychev.selenium;
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.waits.WaitHelper;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -53,6 +54,32 @@ public class AlertsTest {
                     return true; // Alert is dismissed
                 }
             });
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    void scrollPageTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getPracticePageUrl());
+
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("window.scrollBy(0,500);");
+
+            By webTableLocator = By.xpath("//fieldset[2]");
+            WebElement webTableFieldset = waitHelper.visibilityOf(webTableLocator);
+
+            Assert.assertTrue(webTableFieldset.isDisplayed());
         } finally {
             driver.quit();
         }
