@@ -23,6 +23,7 @@ reports/
 screenshots/
 videos/
 logs/
+assets/
 
 ### IntelliJ IDEA ###
 .idea/

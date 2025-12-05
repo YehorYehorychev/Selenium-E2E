@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.waits;
+package com.yehorychev.selenium.helpers;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
