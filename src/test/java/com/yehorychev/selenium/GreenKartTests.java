@@ -156,4 +156,69 @@ public class GreenKartTests {
             driver.quit();
         }
     }
+
+    @Test
+    void verifyDiscountPricesTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getGreenKartUrl());
+
+            By topDealsBtnLocator = By.xpath("//a[normalize-space()='Top Deals']");
+            WebElement topDealsBtn = waitHelper.elementToBeClickable(topDealsBtnLocator);
+            topDealsBtn.click();
+            waitHelper.switchToNewChildWindow();
+
+            // Click on column
+            driver.findElement(By.xpath("//tr/th[1]")).click();
+
+            // Capture all web elements into a list
+            List<WebElement> elementsList = driver.findElements(By.xpath("//tr/td[1]"));
+
+            // Capture text of all elements into (original) list
+            List<String> originalList = elementsList.stream()
+                    .map(WebElement::getText)
+                    .collect(Collectors.toList());
+
+            // Sort the original list → sorted list
+            List<String> sortedList = originalList.stream()
+                    .sorted()
+                    .collect(Collectors.toList());
+
+            // Compare original list vs sorted list
+            Assert.assertEquals(sortedList, originalList);
+
+            List<String> price;
+
+            // Scan the name column → find “Rice” → get its price
+            do {
+                List<WebElement> rows = driver.findElements(By.xpath("//tr/td[1]"));
+                price = rows.stream()
+                        .filter(s -> s.getText().contains("Rice"))
+                        .map(GreenKartTests::getPriceVeggie)
+                        .toList();
+
+                price.forEach(System.out::println);
+
+                if (price.isEmpty()) {
+                    driver.findElement(By.cssSelector("[aria-label='Next']")).click();
+                }
+            } while (price.isEmpty());
+
+        } finally {
+            driver.quit();
+        }
+    }
+
+    private static String getPriceVeggie(WebElement element) {
+        // Locate the price cell next to the vegetable name
+        return element.findElement(By.xpath("following-sibling::td[1]")).getText();
+    }
 }

@@ -9,6 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class WaitHelper {
@@ -63,5 +64,31 @@ public class WaitHelper {
             WebElement element = driver.findElement(locator);
             return String.valueOf(expectedCount).equals(element.getText().trim()) ? element : null;
         });
+    }
+
+    public void switchToNewChildWindow() {
+        String currentHandle = driver.getWindowHandle();
+
+        buildWait().until(d -> {
+            Set<String> handles = d.getWindowHandles();
+            return handles.size() > 1 && handles.stream().anyMatch(handle -> !handle.equals(currentHandle));
+        });
+
+        for (String handle : driver.getWindowHandles()) {
+            if (!handle.equals(currentHandle)) {
+                driver.switchTo().window(handle);
+                return;
+            }
+        }
+
+        throw new IllegalStateException("New window handle not found after wait");
+    }
+
+    public void switchToParentWindow(String targetHandle) {
+        buildWait().until(d -> d.getWindowHandles().contains(targetHandle));
+        if (!driver.getWindowHandles().contains(targetHandle)) {
+            throw new IllegalArgumentException("Window handle not found: " + targetHandle);
+        }
+        driver.switchTo().window(targetHandle);
     }
 }
