@@ -121,4 +121,23 @@ public class AlertsTest {
             driver.quit();
         }
     }
+
+    @Test
+    void brokenLinksTest() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getPracticePageUrl());
+
+        } finally {
+            driver.quit();
+        }
+    }
 }
