@@ -1,5 +1,6 @@
 package com.yehorychev.selenium;
 
+import com.sun.source.tree.AssertTree;
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import org.openqa.selenium.By;
@@ -10,7 +11,11 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +122,49 @@ public class AlertsTest {
                 }
             }
             Assert.assertTrue(webTableFieldset.isDisplayed());
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    void brokenLinksTest() throws IOException {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+        options.setExperimentalOption("useAutomationExtension", false);
+
+        WebDriver driver = new ChromeDriver(options);
+        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+        SoftAssert softAssert = new SoftAssert();
+
+        try {
+            driver.manage().window().maximize();
+            driver.navigate().to(ConfigProperties.getPracticePageUrl());
+
+            // Find all links in the footer section
+            List<WebElement> links = driver.findElements(By.cssSelector("li[class='gf-li'] a"));
+            for (WebElement link : links) {
+                String href = link.getAttribute("href");
+                if (href == null || href.isBlank()) {
+                    System.out.println("Skipping link with empty href attribute");
+                    continue;
+                }
+
+                HttpURLConnection connection = (HttpURLConnection) new URL(href).openConnection();
+                connection.setRequestMethod("HEAD");
+                connection.connect();
+                int responseCode = connection.getResponseCode();
+
+                if (responseCode >= 400) {
+                    String message = String.format("Broken link: %s (Response code: %d)", href, responseCode);
+                    softAssert.fail(message);
+                    System.out.println(message);
+                } else {
+                    System.out.printf("Valid link: %s (Response code: %d)%n", href, responseCode);
+                }
+            }
+            softAssert.assertAll();
         } finally {
             driver.quit();
         }
