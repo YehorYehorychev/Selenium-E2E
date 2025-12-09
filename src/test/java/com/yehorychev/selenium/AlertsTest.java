@@ -1,5 +1,6 @@
 package com.yehorychev.selenium;
 
+import com.sun.source.tree.AssertTree;
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import org.openqa.selenium.By;
@@ -139,22 +140,30 @@ public class AlertsTest {
             driver.manage().window().maximize();
             driver.navigate().to(ConfigProperties.getPracticePageUrl());
 
-            // Find the link with 'soapui' in the href attribute
-            String url = driver.findElement(By.cssSelector("a[href*='soapui']")).getAttribute("href");
+            // Find all links in the footer section
+            List<WebElement> links = driver.findElements(By.cssSelector("li[class='gf-li'] a"));
+            List<String> brokenLinks = new ArrayList<>();
+            for (WebElement link : links) {
+                String href = link.getAttribute("href");
+                if (href == null || href.isBlank()) {
+                    System.out.println("Skipping link with empty href attribute");
+                    continue;
+                }
 
-            // Check the link's HTTP response code
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-            connection.setRequestMethod("HEAD");
-            connection.connect();
-            int responseCode = connection.getResponseCode();
-            System.out.printf("\nURL: %s, Response Code: %d%n", url, responseCode);
+                HttpURLConnection connection = (HttpURLConnection) new URL(href).openConnection();
+                connection.setRequestMethod("HEAD");
+                connection.connect();
+                int responseCode = connection.getResponseCode();
 
-            if (responseCode >= 400) {
-                System.out.printf("The link is broken: %s%n", url);
-            } else {
-                System.out.printf("The link is valid: %s%n", url);
+                if (responseCode >= 400) {
+                    String message = String.format("Broken link: %s (Response code: %d)", href, responseCode);
+                    brokenLinks.add(message);
+                    System.out.println(message);
+                } else {
+                    System.out.printf("Valid link: %s (Response code: %d)%n", href, responseCode);
+                }
             }
-            Assert.assertTrue(responseCode < 400, "Link is broken with response code: " + responseCode);
+            Assert.assertTrue(brokenLinks.isEmpty(), String.join("\n", brokenLinks));
         } finally {
             driver.quit();
         }
