@@ -11,6 +11,9 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +126,7 @@ public class AlertsTest {
     }
 
     @Test
-    void brokenLinksTest() {
+    void brokenLinksTest() throws IOException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
@@ -136,6 +139,22 @@ public class AlertsTest {
             driver.manage().window().maximize();
             driver.navigate().to(ConfigProperties.getPracticePageUrl());
 
+            // Find the link with 'soapui' in the href attribute
+            String url = driver.findElement(By.cssSelector("a[href*='soapui']")).getAttribute("href");
+
+            // Check the link's HTTP response code
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("HEAD");
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            System.out.printf("\nURL: %s, Response Code: %d%n", url, responseCode);
+
+            if (responseCode >= 400) {
+                System.out.printf("The link is broken: %s%n", url);
+            } else {
+                System.out.printf("The link is valid: %s%n", url);
+            }
+            Assert.assertTrue(responseCode < 400, "Link is broken with response code: " + responseCode);
         } finally {
             driver.quit();
         }
