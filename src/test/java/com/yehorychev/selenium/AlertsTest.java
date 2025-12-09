@@ -11,6 +11,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import org.testng.asserts.SoftAssert;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -135,6 +136,7 @@ public class AlertsTest {
 
         WebDriver driver = new ChromeDriver(options);
         WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+        SoftAssert softAssert = new SoftAssert();
 
         try {
             driver.manage().window().maximize();
@@ -142,7 +144,6 @@ public class AlertsTest {
 
             // Find all links in the footer section
             List<WebElement> links = driver.findElements(By.cssSelector("li[class='gf-li'] a"));
-            List<String> brokenLinks = new ArrayList<>();
             for (WebElement link : links) {
                 String href = link.getAttribute("href");
                 if (href == null || href.isBlank()) {
@@ -157,13 +158,13 @@ public class AlertsTest {
 
                 if (responseCode >= 400) {
                     String message = String.format("Broken link: %s (Response code: %d)", href, responseCode);
-                    brokenLinks.add(message);
+                    softAssert.fail(message);
                     System.out.println(message);
                 } else {
                     System.out.printf("Valid link: %s (Response code: %d)%n", href, responseCode);
                 }
             }
-            Assert.assertTrue(brokenLinks.isEmpty(), String.join("\n", brokenLinks));
+            softAssert.assertAll();
         } finally {
             driver.quit();
         }
