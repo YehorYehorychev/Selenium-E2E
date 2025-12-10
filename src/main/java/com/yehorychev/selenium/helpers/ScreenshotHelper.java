@@ -1,5 +1,6 @@
 package com.yehorychev.selenium.helpers;
 
+import com.yehorychev.selenium.config.ConfigProperties;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -15,27 +16,30 @@ import java.time.format.DateTimeFormatter;
 public final class ScreenshotHelper {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
-    private static final Path SCREENSHOT_DIR = Path.of("src", "test", "resources", "assets", "screenshots");
 
     private ScreenshotHelper() {
         // utility class
     }
 
     public static void capture(WebDriver driver, String testName) {
+        capture(driver, testName, ConfigProperties.getScreenshotDirectory());
+    }
+
+    public static void capture(WebDriver driver, String testName, Path directory) {
         if (driver == null) {
             throw new IllegalArgumentException("WebDriver must not be null when capturing a screenshot");
         }
-        if (!(driver instanceof TakesScreenshot)) {
+        if (!(driver instanceof TakesScreenshot takesScreenshot)) {
             throw new IllegalStateException("Provided WebDriver does not support screenshots");
         }
 
         try {
-            Files.createDirectories(SCREENSHOT_DIR);
+            Files.createDirectories(directory);
             String timestamp = LocalDateTime.now().format(FORMATTER);
             String safeName = testName.replaceAll("[^a-zA-Z0-9_-]", "_");
-            Path destination = SCREENSHOT_DIR.resolve(timestamp + "-" + safeName + ".png");
+            Path destination = directory.resolve(timestamp + "-" + safeName + ".png");
 
-            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File screenshot = takesScreenshot.getScreenshotAs(OutputType.FILE);
             Files.copy(screenshot.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new RuntimeException("Failed to capture screenshot for test: " + testName, e);

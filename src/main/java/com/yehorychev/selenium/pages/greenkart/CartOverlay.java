@@ -1,6 +1,7 @@
-package com.yehorychev.selenium.pages;
+package com.yehorychev.selenium.pages.greenkart;
 
 import com.yehorychev.selenium.helpers.WaitHelper;
+import com.yehorychev.selenium.pages.common.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -17,4 +18,3 @@ public class CartOverlay extends BasePage {
         return new CheckoutPage(driver, waitHelper);
     }
 }
-

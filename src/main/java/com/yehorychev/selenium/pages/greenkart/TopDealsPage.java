@@ -1,6 +1,7 @@
-package com.yehorychev.selenium.pages;
+package com.yehorychev.selenium.pages.greenkart;
 
 import com.yehorychev.selenium.helpers.WaitHelper;
+import com.yehorychev.selenium.pages.common.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -46,7 +47,7 @@ public class TopDealsPage extends BasePage {
             }
         } while (prices.isEmpty());
 
-        return prices.getFirst();
+        return prices.get(0);
     }
 
     private static String extractPrice(WebElement element) {
@@ -58,4 +59,3 @@ public class TopDealsPage extends BasePage {
         waitHelper.switchToParentWindow(parentWindowHandle);
     }
 }
-
