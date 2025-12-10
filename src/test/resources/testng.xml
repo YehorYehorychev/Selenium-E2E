@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+<suite name="SeleniumFrameworkSuite" parallel="false">
+    <test name="AllUITests">
+        <classes>
+            <class name="com.yehorychev.selenium.GreenKartTests"/>
+            <class name="com.yehorychev.selenium.AmazonTests"/>
+            <class name="com.yehorychev.selenium.FlightBookingTests"/>
+            <class name="com.yehorychev.selenium.AlertsTest"/>
+        </classes>
+    </test>
+</suite>
+

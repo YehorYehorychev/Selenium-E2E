@@ -1,14 +1,9 @@
 package com.yehorychev.selenium;
 
-import com.sun.source.tree.AssertTree;
-import com.yehorychev.selenium.config.ConfigProperties;
-import com.yehorychev.selenium.helpers.WaitHelper;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
+import com.yehorychev.selenium.pages.practice.PracticeAlertsPage;
+import com.yehorychev.selenium.pages.practice.PracticeFooterSection;
+import com.yehorychev.selenium.pages.practice.PracticeTableSection;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
@@ -16,157 +11,68 @@ import org.testng.asserts.SoftAssert;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class AlertsTest {
+public class AlertsTest extends BaseTest {
+
+    @Override
+    protected String getDefaultBaseUrlKey() {
+        return "base.url.practice.page";
+    }
 
     @Test
     void dismissAlertTest() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-blink-features=AutomationControlled");
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-        options.setExperimentalOption("useAutomationExtension", false);
+        PracticeAlertsPage alertsPage = new PracticeAlertsPage(driver, waitHelper);
+        alertsPage.enterName("Yehor");
+        alertsPage.triggerConfirmAlert();
 
-        WebDriver driver = new ChromeDriver(options);
-        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+        String alertText = alertsPage.readAlertText();
+        Assert.assertEquals(alertText, "Hello Yehor, Are you sure you want to confirm?");
 
-        try {
-            driver.manage().window().maximize();
-            driver.navigate().to(ConfigProperties.getPracticePageUrl());
-
-            By nameFieldLocator = By.xpath("//input[@id='name']");
-            By confirmBtnLocator = By.xpath("//input[@id='confirmbtn']");
-
-            WebElement nameField = waitHelper.elementToBeClickable(nameFieldLocator);
-            nameField.sendKeys("Yehor");
-
-            WebElement confirmBtn = waitHelper.elementToBeClickable(confirmBtnLocator);
-            confirmBtn.click();
-
-            // Assert that alert is present
-            String alertText = waitHelper.alertIsPresent().getText();
-            Assert.assertEquals(alertText, "Hello Yehor, Are you sure you want to confirm?");
-
-            // Dismiss the alert
-            driver.switchTo().alert().dismiss();
-
-            // Verify alert is dismissed
-            waitHelper.until(d -> {
-                try {
-                    d.switchTo().alert();
-                    return false; // Alert is still present
-                } catch (Exception e) {
-                    return true; // Alert is dismissed
-                }
-            });
-        } finally {
-            driver.quit();
-        }
+        alertsPage.dismissAlert();
+        alertsPage.waitForAlertDismissed();
     }
 
     @Test
     void scrollPageTest() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-blink-features=AutomationControlled");
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-        options.setExperimentalOption("useAutomationExtension", false);
+        PracticeAlertsPage alertsPage = new PracticeAlertsPage(driver, waitHelper);
+        PracticeTableSection tableSection = new PracticeTableSection(driver, waitHelper);
 
-        WebDriver driver = new ChromeDriver(options);
-        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+        alertsPage.scrollWindowBy(0, 500);
+        Assert.assertTrue(alertsPage.getWebTableSection().isDisplayed());
 
-        try {
-            driver.manage().window().maximize();
-            driver.navigate().to(ConfigProperties.getPracticePageUrl());
+        alertsPage.scrollFixedTableToBottom();
+        List<String> rowValues = tableSection.readFourthRowValues();
 
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript("window.scrollBy(0,500);");
-
-            By webTableLocator = By.xpath("//fieldset[2]");
-            WebElement webTableFieldset = waitHelper.visibilityOf(webTableLocator);
-            // ensure the scrollable table area is scrolled so all rows/cells are available
-            js.executeScript("document.querySelector('.tableFixHead').scrollTop=5000");
-
-            // Wait for rows to be present and then retrieve the 4th row's cell values
-            By rowsLocator = By.cssSelector(".tableFixHead tr");
-            List<WebElement> rows = waitHelper.presenceOfAllElements(rowsLocator);
-
-            List<String> values = new ArrayList<>();
-
-            if (rows.size() >= 4) {
-                WebElement fourthRow = rows.get(3); // zero-based index -> 3 is the 4th row
-                List<WebElement> cells = fourthRow.findElements(By.tagName("td"));
-
-                if (!cells.isEmpty()) {
-                    values = cells.stream()
-                            .map(WebElement::getText)
-                            .collect(Collectors.toList());
-
-                    System.out.printf("Values in 4th row (cells count %d): %s%n", values.size(), values);
-                }
-            }
-
-            // If the 4th row didn't yield expected values, fall back to reading the 4th column across all rows
-            if (values.size() != 9) {
-                List<WebElement> colValues = waitHelper.presenceOfAllElements(By.cssSelector(".tableFixHead td:nth-child(4)"));
-                if (!colValues.isEmpty()) {
-                    values = colValues.stream()
-                            .map(WebElement::getText)
-                            .collect(Collectors.toList());
-
-                    System.out.printf("Values in 4th column (found %d): %s%n", values.size(), values);
-                } else {
-                    System.out.printf("Could not find values in 4th row or 4th column; rows=%d, rowCells=%d%n", rows.size(), values.size());
-                }
-            }
-            Assert.assertTrue(webTableFieldset.isDisplayed());
-        } finally {
-            driver.quit();
+        if (rowValues.size() != 9) {
+            rowValues = tableSection.readFourthColumnValues();
         }
+
+        Assert.assertFalse(rowValues.isEmpty(), "Expected values for table row/column, but none were found");
     }
 
     @Test
     void brokenLinksTest() throws IOException {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-blink-features=AutomationControlled");
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-        options.setExperimentalOption("useAutomationExtension", false);
-
-        WebDriver driver = new ChromeDriver(options);
-        WaitHelper waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
+        PracticeFooterSection footerSection = new PracticeFooterSection(driver, waitHelper);
         SoftAssert softAssert = new SoftAssert();
 
-        try {
-            driver.manage().window().maximize();
-            driver.navigate().to(ConfigProperties.getPracticePageUrl());
-
-            // Find all links in the footer section
-            List<WebElement> links = driver.findElements(By.cssSelector("li[class='gf-li'] a"));
-            for (WebElement link : links) {
-                String href = link.getAttribute("href");
-                if (href == null || href.isBlank()) {
-                    System.out.println("Skipping link with empty href attribute");
-                    continue;
-                }
-
-                HttpURLConnection connection = (HttpURLConnection) new URL(href).openConnection();
-                connection.setRequestMethod("HEAD");
-                connection.connect();
-                int responseCode = connection.getResponseCode();
-
-                if (responseCode >= 400) {
-                    String message = String.format("Broken link: %s (Response code: %d)", href, responseCode);
-                    softAssert.fail(message);
-                    System.out.println(message);
-                } else {
-                    System.out.printf("Valid link: %s (Response code: %d)%n", href, responseCode);
-                }
+        List<WebElement> links = footerSection.getFooterLinks();
+        for (WebElement link : links) {
+            String href = link.getAttribute("href");
+            if (href == null || href.isBlank()) {
+                continue;
             }
-            softAssert.assertAll();
-        } finally {
-            driver.quit();
+
+            HttpURLConnection connection = (HttpURLConnection) new URL(href).openConnection();
+            connection.setRequestMethod("HEAD");
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+
+            if (responseCode >= 400) {
+                softAssert.fail(String.format("Broken link: %s (Response code: %d)", href, responseCode));
+            }
         }
+
+        softAssert.assertAll();
     }
 }

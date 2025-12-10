@@ -1,9 +1,9 @@
 package com.yehorychev.selenium;
 
-import com.yehorychev.selenium.pages.CartOverlay;
-import com.yehorychev.selenium.pages.CheckoutPage;
-import com.yehorychev.selenium.pages.GreenKartHomePage;
-import com.yehorychev.selenium.pages.TopDealsPage;
+import com.yehorychev.selenium.pages.greenkart.CartOverlay;
+import com.yehorychev.selenium.pages.greenkart.CheckoutPage;
+import com.yehorychev.selenium.pages.greenkart.GreenKartHomePage;
+import com.yehorychev.selenium.pages.greenkart.TopDealsPage;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
