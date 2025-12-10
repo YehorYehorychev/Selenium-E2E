@@ -1,10 +1,12 @@
 package com.yehorychev.selenium;
 
 import com.yehorychev.selenium.config.ConfigProperties;
+import com.yehorychev.selenium.helpers.ScreenshotHelper;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -31,10 +33,19 @@ public abstract class BaseTest {
     }
 
     @AfterMethod(alwaysRun = true)
-    public void tearDown() {
+    public void tearDown(ITestResult result) {
         if (driver != null) {
-            driver.quit();
+            try {
+                boolean failuresOnly = ConfigProperties.captureScreenshotsOnFailuresOnly();
+                boolean shouldCapture = !failuresOnly || result.getStatus() == ITestResult.FAILURE;
+                if (shouldCapture) {
+                    ScreenshotHelper.capture(driver, result.getMethod().getMethodName());
+                }
+            } catch (RuntimeException screenshotError) {
+                // screenshot failures should not block driver cleanup
+            } finally {
+                driver.quit();
+            }
         }
     }
 }
-

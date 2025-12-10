@@ -2,6 +2,7 @@ package com.yehorychev.selenium.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Properties;
 
 /**
@@ -67,6 +68,24 @@ public class ConfigProperties {
      */
     public static String getAmazonUrl() {
         return getProperty("base.url.amazon");
+    }
+
+    /**
+     * Get the directory where screenshots will be saved
+     *
+     * @return Screenshot directory path
+     */
+    public static Path getScreenshotDirectory() {
+        return Path.of(getProperty("screenshot.directory"));
+    }
+
+    /**
+     * Check if screenshots should be captured only on test failures
+     *
+     * @return true if screenshots should be captured on failures only, false otherwise
+     */
+    public static boolean captureScreenshotsOnFailuresOnly() {
+        return Boolean.parseBoolean(getProperty("screenshot.failures.only"));
     }
 
     /**
