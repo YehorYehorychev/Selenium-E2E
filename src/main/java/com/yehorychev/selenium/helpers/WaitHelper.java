@@ -59,7 +59,6 @@ public class WaitHelper {
     }
 
     public WebElement waitForCartCount(By locator, int expectedCount) {
-        // retries until the cart badge shows the targeted count
         return buildWait().until(driver -> {
             WebElement element = driver.findElement(locator);
             return String.valueOf(expectedCount).equals(element.getText().trim()) ? element : null;
@@ -92,3 +91,4 @@ public class WaitHelper {
         driver.switchTo().window(targetHandle);
     }
 }
+
