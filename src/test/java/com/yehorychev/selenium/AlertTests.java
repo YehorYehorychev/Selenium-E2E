@@ -13,7 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-public class AlertsTest extends BaseTest {
+public class AlertTests extends BaseTest {
 
     @Override
     protected String getDefaultBaseUrlKey() {
