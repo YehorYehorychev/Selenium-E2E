@@ -3,6 +3,7 @@ package com.yehorychev.selenium.config;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Properties;
 
 /**
@@ -86,6 +87,14 @@ public class ConfigProperties {
      */
     public static boolean captureScreenshotsOnFailuresOnly() {
         return Boolean.parseBoolean(getProperty("screenshot.failures.only"));
+    }
+
+    public static Duration getDefaultWaitTimeout() {
+        return Duration.ofSeconds(Long.parseLong(getProperty("wait.default.seconds")));
+    }
+
+    public static Duration getDefaultWaitPollingInterval() {
+        return Duration.ofMillis(Long.parseLong(getProperty("wait.polling.millis")));
     }
 
     /**

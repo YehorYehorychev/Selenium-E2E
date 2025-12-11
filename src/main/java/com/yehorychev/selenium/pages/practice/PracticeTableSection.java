@@ -20,7 +20,8 @@ public class PracticeTableSection extends BasePage {
     }
 
     public void scrollTableToBottom() {
-        jsExecutor().executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", waitHelper.visibilityOf(FIXED_HEADER_TABLE));
+        WebElement table = find(FIXED_HEADER_TABLE);
+        jsExecutor().executeScript("arguments[0].scrollTop = arguments[0].scrollHeight;", table);
     }
 
     public List<String> readFourthRowValues() {
@@ -38,4 +39,3 @@ public class PracticeTableSection extends BasePage {
                 .collect(Collectors.toList());
     }
 }
-

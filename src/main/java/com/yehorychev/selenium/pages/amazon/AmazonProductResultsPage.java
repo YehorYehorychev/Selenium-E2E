@@ -17,20 +17,17 @@ public class AmazonProductResultsPage extends BasePage {
 
     public AmazonProductResultsPage(WebDriver driver, WaitHelper waitHelper) {
         super(driver, waitHelper);
-        waitHelper.visibilityOf(RESULTS_CONTAINER);
+        find(RESULTS_CONTAINER);
     }
 
     public List<String> getSearchResults() {
-        List<WebElement> items = driver.findElements(RESULT_ITEMS);
-        return items.stream()
+        return findAll(RESULT_ITEMS).stream()
                 .map(WebElement::getText)
                 .filter(text -> !text.isBlank())
                 .collect(Collectors.toList());
     }
 
     public String getSearchBoxValue() {
-        WebElement searchBar = waitHelper.visibilityOf(SEARCH_BAR);
-        return searchBar.getAttribute("value");
+        return find(SEARCH_BAR).getAttribute("value");
     }
 }
-

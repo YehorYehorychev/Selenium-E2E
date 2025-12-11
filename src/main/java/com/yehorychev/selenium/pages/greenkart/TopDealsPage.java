@@ -23,11 +23,11 @@ public class TopDealsPage extends BasePage {
     }
 
     public void sortNameColumn() {
-        driver.findElement(NAME_COLUMN_HEADER).click();
+        click(NAME_COLUMN_HEADER);
     }
 
     public List<String> getDisplayedNames() {
-        return driver.findElements(NAME_COLUMN_CELLS)
+        return findAll(NAME_COLUMN_CELLS)
                 .stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
@@ -36,14 +36,14 @@ public class TopDealsPage extends BasePage {
     public String getPriceFor(String veggieName) {
         List<String> prices;
         do {
-            List<WebElement> rows = driver.findElements(NAME_COLUMN_CELLS);
+            List<WebElement> rows = findAll(NAME_COLUMN_CELLS);
             prices = rows.stream()
                     .filter(row -> row.getText().contains(veggieName))
                     .map(TopDealsPage::extractPrice)
                     .collect(Collectors.toList());
 
             if (prices.isEmpty()) {
-                driver.findElement(NEXT_BUTTON).click();
+                click(NEXT_BUTTON);
             }
         } while (prices.isEmpty());
 

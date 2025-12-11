@@ -26,11 +26,11 @@ public class CheckoutPage extends BasePage {
     }
 
     public void applyPromoCode(String promoCode) {
-        waitHelper.visibilityOf(PROMO_CODE_FIELD).sendKeys(promoCode);
-        waitHelper.elementToBeClickable(APPLY_BUTTON).click();
+        type(PROMO_CODE_FIELD, promoCode);
+        click(APPLY_BUTTON);
     }
 
     public String getPromoInfoText() {
-        return waitHelper.visibilityOf(PROMO_INFO).getText().trim();
+        return getText(PROMO_INFO).trim();
     }
 }

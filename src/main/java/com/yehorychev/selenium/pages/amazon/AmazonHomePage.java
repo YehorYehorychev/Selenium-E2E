@@ -21,28 +21,28 @@ public class AmazonHomePage extends BasePage {
     }
 
     public AmazonProductResultsPage searchFor(String query) {
-        WebElement searchBar = waitHelper.visibilityOf(SEARCH_BAR);
+        WebElement searchBar = find(SEARCH_BAR);
         actions().moveToElement(searchBar).click().keyDown(Keys.SHIFT).sendKeys(query).keyUp(Keys.SHIFT).perform();
         searchBar.submit();
         return new AmazonProductResultsPage(driver, waitHelper);
     }
 
     public void hoverOverAccountsAndLists() {
-        WebElement element = waitHelper.visibilityOf(ACCOUNTS_AND_LISTS);
+        WebElement element = find(ACCOUNTS_AND_LISTS);
         actions().moveToElement(element).perform();
     }
 
     public void openWatchlist() {
-        waitHelper.elementToBeClickable(WATCHLIST_LINK).click();
+        click(WATCHLIST_LINK);
     }
 
     public boolean isSignInHeaderDisplayed() {
-        return waitHelper.visibilityOf(SIGN_IN_HEADER).isDisplayed();
+        return isVisible(SIGN_IN_HEADER);
     }
 
     public AmazonCartPage openCartInNewWindow() {
         String parentWindow = driver.getWindowHandle();
-        WebElement cart = waitHelper.elementToBeClickable(CART_ICON);
+        WebElement cart = find(CART_ICON);
         actions().keyDown(platformControlKey()).moveToElement(cart).click().keyUp(platformControlKey()).perform();
         waitHelper.switchToNewChildWindow();
         return new AmazonCartPage(driver, waitHelper, parentWindow);
@@ -50,6 +50,7 @@ public class AmazonHomePage extends BasePage {
 
     public boolean isShopGiftCategoryVisible() {
         driver.switchTo().window(driver.getWindowHandle());
-        return waitHelper.visibilityOf(SHOP_GIFT_CATEGORY_HEADER).isDisplayed();
+        waitForPageReady();
+        return isVisible(SHOP_GIFT_CATEGORY_HEADER);
     }
 }

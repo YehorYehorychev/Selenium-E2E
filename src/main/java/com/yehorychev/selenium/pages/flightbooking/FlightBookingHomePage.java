@@ -26,68 +26,68 @@ public class FlightBookingHomePage extends BasePage {
     }
 
     public void setCurrency(String currencyCode) {
-        WebElement dropdownElement = waitHelper.visibilityOf(CURRENCY_DROPDOWN);
+        WebElement dropdownElement = find(CURRENCY_DROPDOWN);
         Select dropdown = new Select(dropdownElement);
         dropdown.selectByVisibleText(currencyCode);
-        waitHelper.until(d -> currencyCode.equals(dropdown.getFirstSelectedOption().getText()));
+        waitHelper.until(d -> currencyCode.equalsIgnoreCase(dropdown.getFirstSelectedOption().getText().trim()));
     }
 
     public String getSelectedCurrency() {
-        Select dropdown = new Select(waitHelper.visibilityOf(CURRENCY_DROPDOWN));
+        Select dropdown = new Select(find(CURRENCY_DROPDOWN));
         return dropdown.getFirstSelectedOption().getText();
     }
 
     public void openPassengerSelector() {
-        waitHelper.elementToBeClickable(PASSENGER_INFO).click();
+        click(PASSENGER_INFO);
     }
 
     public void addAdults(int count) {
-        WebElement adultPlus = waitHelper.elementToBeClickable(ADULT_PLUS_BTN);
+        WebElement adultPlus = waitHelper.visibilityOf(ADULT_PLUS_BTN);
         for (int i = 0; i < count; i++) {
             adultPlus.click();
         }
     }
 
     public void addChildren(int count) {
-        WebElement childPlus = waitHelper.elementToBeClickable(CHILD_PLUS_BTN);
+        WebElement childPlus = waitHelper.visibilityOf(CHILD_PLUS_BTN);
         for (int i = 0; i < count; i++) {
             childPlus.click();
         }
     }
 
     public void confirmPassengers() {
-        waitHelper.elementToBeClickable(PASSENGER_DONE_BTN).click();
+        click(PASSENGER_DONE_BTN);
     }
 
     public String getPassengerInfo() {
-        return waitHelper.visibilityOf(PASSENGER_INFO).getText();
+        return getText(PASSENGER_INFO);
     }
 
     public void selectOrigin(String cityCode) {
-        waitHelper.elementToBeClickable(ORIGIN_INPUT).click();
-        waitHelper.elementToBeClickable(By.xpath("//a[@value='" + cityCode + "']")).click();
+        click(ORIGIN_INPUT);
+        click(By.xpath("//a[@value='" + cityCode + "']"));
     }
 
     public void selectDestination(String cityCode) {
-        waitHelper.elementToBeClickable(DESTINATION_INPUT).click();
-        waitHelper.elementToBeClickable(By.xpath("//a[@value='" + cityCode + "']")).click();
+        click(DESTINATION_INPUT);
+        click(By.xpath("//a[@value='" + cityCode + "']"));
     }
 
     public String getSelectedOrigin() {
-        return waitHelper.visibilityOf(ORIGIN_INPUT).getAttribute("value");
+        return find(ORIGIN_INPUT).getAttribute("value");
     }
 
     public String getSelectedDestination() {
-        return waitHelper.visibilityOf(DESTINATION_INPUT).getAttribute("value");
+        return find(DESTINATION_INPUT).getAttribute("value");
     }
 
     public void searchCountry(String partialName) {
-        waitHelper.elementToBeClickable(COUNTRY_AUTOSUGGEST).sendKeys(partialName);
+        type(COUNTRY_AUTOSUGGEST, partialName);
         waitHelper.visibilityOfAllElements(COUNTRY_SUGGESTIONS);
     }
 
     public void chooseCountrySuggestion(String countryName) {
-        List<WebElement> suggestions = driver.findElements(COUNTRY_SUGGESTIONS);
+        List<WebElement> suggestions = findAll(COUNTRY_SUGGESTIONS);
         suggestions.stream()
                 .filter(option -> option.getText().equalsIgnoreCase(countryName))
                 .findFirst()
@@ -95,7 +95,6 @@ public class FlightBookingHomePage extends BasePage {
     }
 
     public String getSelectedCountry() {
-        return waitHelper.visibilityOf(COUNTRY_AUTOSUGGEST).getAttribute("value");
+        return find(COUNTRY_AUTOSUGGEST).getAttribute("value");
     }
 }
-

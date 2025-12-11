@@ -3,7 +3,6 @@ package com.yehorychev.selenium.pages.common;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -17,6 +16,8 @@ public abstract class BasePage {
     protected final WebDriver driver;
     protected final WaitHelper waitHelper;
     protected final Logger log = LoggerFactory.getLogger(getClass());
+    private static final int DEFAULT_CLICK_RETRIES = 3;
+    private static final Duration DEFAULT_CLICK_BACKOFF = Duration.ofMillis(200);
 
     protected BasePage(WebDriver driver, WaitHelper waitHelper) {
         this.driver = driver;
@@ -44,25 +45,18 @@ public abstract class BasePage {
     }
 
     protected WebElement find(By locator) {
-        try {
-            log.debug("Finding visible element: {}", locator);
-            return waitHelper.visibilityOf(locator);
-        } catch (TimeoutException e) {
-            throw enrichAndWrap("Timed out waiting for visibility", locator, e);
-        }
+        log.debug("Finding visible element: {}", locator);
+        return waitHelper.visibilityOf(locator);
     }
 
     protected List<WebElement> findAll(By locator) {
-        try {
-            log.debug("Finding all visible elements: {}", locator);
-            return waitHelper.visibilityOfAllElements(locator);
-        } catch (TimeoutException e) {
-            throw enrichAndWrap("Timed out waiting for elements", locator, e);
-        }
+        log.debug("Finding all visible elements: {}", locator);
+        return waitHelper.visibilityOfAllElements(locator);
     }
 
     protected void click(By locator) {
-        retryingClick(locator, 3, Duration.ofMillis(200));
+        log.debug("Clicking element: {}", locator);
+        waitHelper.retryingClick(locator, DEFAULT_CLICK_RETRIES, DEFAULT_CLICK_BACKOFF);
     }
 
     protected void type(By locator, String text) {
@@ -88,47 +82,17 @@ public abstract class BasePage {
         }
     }
 
-    protected void retryingClick(By locator, int attempts, Duration backoff) {
-        RuntimeException lastError = null;
-        for (int i = 0; i < attempts; i++) {
-            try {
-                log.debug("Click attempt {} for {}", i + 1, locator);
-                WebElement clickable = waitHelper.elementToBeClickable(locator);
-                clickable.click();
-                return;
-            } catch (RuntimeException e) {
-                lastError = e;
-                sleep(backoff);
-                safeScrollIntoView(locator);
-            }
-        }
-        throw enrichAndWrap("Unable to click element after retries", locator, lastError);
-    }
-
     protected void safeScrollIntoView(By locator) {
-        try {
-            log.debug("Scrolling element into view: {}", locator);
-            jsExecutor().executeScript("arguments[0].scrollIntoView({block: 'center'});", driver.findElement(locator));
-        } catch (RuntimeException e) {
-            log.warn("Failed to scroll into view {}", locator, e);
-        }
+        log.debug("Scrolling element into view: {}", locator);
+        waitHelper.safeScrollIntoView(locator);
     }
 
     protected void waitForPageReady() {
-        log.debug("Waiting for document.readyState=complete");
-        waitHelper.until((ExpectedCondition<Boolean>) drv ->
-                "complete".equals(jsExecutor().executeScript("return document.readyState")));
+        waitHelper.waitForPageReady();
     }
 
     protected void waitForAjaxComplete() {
-        log.debug("Waiting for AJAX queue to finish");
-        waitHelper.until(driver -> {
-            JavascriptExecutor js = jsExecutor();
-            Object jqueryActive = js.executeScript("return window.jQuery ? jQuery.active : 0");
-            Object fetchInflight = js.executeScript("return window.___fetchInFlight || 0");
-            long active = toLong(jqueryActive) + toLong(fetchInflight);
-            return active == 0;
-        });
+        waitHelper.waitForAjaxComplete();
     }
 
     protected void assertTextEquals(By locator, String expected) {
@@ -186,30 +150,5 @@ public abstract class BasePage {
     protected void clearCookies() {
         log.debug("Clearing all cookies");
         driver.manage().deleteAllCookies();
-    }
-
-    private long toLong(Object value) {
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-        try {
-            return Long.parseLong(String.valueOf(value));
-        } catch (NumberFormatException ignored) {
-            return 0L;
-        }
-    }
-
-    private void sleep(Duration backoff) {
-        try {
-            Thread.sleep(backoff.toMillis());
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    private RuntimeException enrichAndWrap(String message, By locator, Throwable cause) {
-        String formatted = String.format("%s - locator: %s", message, locator);
-        log.error(formatted, cause);
-        return new RuntimeException(formatted, cause);
     }
 }
