@@ -1,4 +1,4 @@
-package com.yehorychev.selenium;
+package com.yehorychev.selenium.core;
 
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.helpers.ScreenshotHelper;

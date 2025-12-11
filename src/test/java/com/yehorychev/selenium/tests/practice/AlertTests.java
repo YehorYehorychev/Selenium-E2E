@@ -1,5 +1,6 @@
-package com.yehorychev.selenium;
+package com.yehorychev.selenium.tests.practice;
 
+import com.yehorychev.selenium.core.BaseTest;
 import com.yehorychev.selenium.pages.practice.PracticeAlertsPage;
 import com.yehorychev.selenium.pages.practice.PracticeFooterSection;
 import com.yehorychev.selenium.pages.practice.PracticeTableSection;

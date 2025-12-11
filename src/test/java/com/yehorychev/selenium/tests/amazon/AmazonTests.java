@@ -1,8 +1,9 @@
-package com.yehorychev.selenium;
+package com.yehorychev.selenium.tests.amazon;
 
 import com.yehorychev.selenium.pages.amazon.AmazonCartPage;
 import com.yehorychev.selenium.pages.amazon.AmazonHomePage;
 import com.yehorychev.selenium.pages.amazon.AmazonProductResultsPage;
+import com.yehorychev.selenium.core.BaseTest;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.Ignore;
