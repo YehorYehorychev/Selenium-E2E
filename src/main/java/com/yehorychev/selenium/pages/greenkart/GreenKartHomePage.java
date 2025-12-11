@@ -25,25 +25,24 @@ public class GreenKartHomePage extends BasePage {
         for (int i = 0; i < names.length; i++) {
             String veggie = names[i];
             By addToCartButton = By.xpath("//h4[contains(text(), '" + veggie + "')]/following::button[text()='ADD TO CART']");
-            WebElement button = driver.findElement(addToCartButton);
-            button.click();
-            waitHelper.waitForCartCount(CART_COUNT_LOCATOR, i + 1);
+            click(addToCartButton);
+            waitHelper.waitForTextEquals(CART_COUNT_LOCATOR, String.valueOf(i + 1));
         }
     }
 
     public boolean cartContainsCount(int expectedCount) {
-        WebElement element = waitHelper.waitForCartCount(CART_COUNT_LOCATOR, expectedCount);
+        WebElement element = waitHelper.waitForTextEquals(CART_COUNT_LOCATOR, String.valueOf(expectedCount));
         return String.valueOf(expectedCount).equals(element.getText().trim());
     }
 
     public CartOverlay openCartOverlay() {
-        waitHelper.elementToBeClickable(CART_ICON).click();
+        click(CART_ICON);
         return new CartOverlay(driver, waitHelper);
     }
 
     public TopDealsPage openTopDeals() {
         String parentWindow = driver.getWindowHandle();
-        waitHelper.elementToBeClickable(TOP_DEALS).click();
+        click(TOP_DEALS);
         waitHelper.switchToNewChildWindow();
         return new TopDealsPage(driver, waitHelper, parentWindow);
     }

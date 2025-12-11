@@ -1,6 +1,7 @@
-package com.yehorychev.selenium;
+package com.yehorychev.selenium.tests.flightbooking;
 
 import com.yehorychev.selenium.pages.flightbooking.FlightBookingHomePage;
+import com.yehorychev.selenium.core.BaseTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

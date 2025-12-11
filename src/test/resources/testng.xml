@@ -3,10 +3,10 @@
 <suite name="SeleniumFrameworkSuite" parallel="false">
     <test name="AllUITests">
         <classes>
-            <class name="com.yehorychev.selenium.GreenKartTests"/>
-            <class name="com.yehorychev.selenium.AmazonTests"/>
-            <class name="com.yehorychev.selenium.FlightBookingTests"/>
-            <class name="com.yehorychev.selenium.AlertTests"/>
+            <class name="com.yehorychev.selenium.tests.greenkart.GreenKartTests"/>
+            <class name="com.yehorychev.selenium.tests.amazon.AmazonTests"/>
+            <class name="com.yehorychev.selenium.tests.flightbooking.FlightBookingTests"/>
+            <class name="com.yehorychev.selenium.tests.practice.AlertTests"/>
         </classes>
     </test>
 </suite>

@@ -14,11 +14,11 @@ public class AmazonCartPage extends BasePage {
     public AmazonCartPage(WebDriver driver, WaitHelper waitHelper, String parentWindowHandle) {
         super(driver, waitHelper);
         this.parentWindowHandle = parentWindowHandle;
-        waitHelper.visibilityOf(CART_HEADER);
+        find(CART_HEADER);
     }
 
     public boolean isCartHeaderDisplayed() {
-        return waitHelper.visibilityOf(CART_HEADER).isDisplayed();
+        return isVisible(CART_HEADER);
     }
 
     public AmazonHomePage returnToParentWindow() {
@@ -26,4 +26,3 @@ public class AmazonCartPage extends BasePage {
         return new AmazonHomePage(driver, waitHelper);
     }
 }
-

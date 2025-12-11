@@ -14,7 +14,7 @@ public class CartOverlay extends BasePage {
     }
 
     public CheckoutPage proceedToCheckout() {
-        waitHelper.elementToBeClickable(PROCEED_TO_CHECKOUT).click();
+        click(PROCEED_TO_CHECKOUT);
         return new CheckoutPage(driver, waitHelper);
     }
 }

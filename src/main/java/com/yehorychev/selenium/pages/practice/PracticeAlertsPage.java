@@ -3,6 +3,8 @@ package com.yehorychev.selenium.pages.practice;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import com.yehorychev.selenium.pages.common.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -17,11 +19,11 @@ public class PracticeAlertsPage extends BasePage {
     }
 
     public void enterName(String name) {
-        waitHelper.elementToBeClickable(NAME_FIELD).sendKeys(name);
+        type(NAME_FIELD, name);
     }
 
     public void triggerConfirmAlert() {
-        waitHelper.elementToBeClickable(CONFIRM_BUTTON).click();
+        click(CONFIRM_BUTTON);
     }
 
     public String readAlertText() {
@@ -37,14 +39,14 @@ public class PracticeAlertsPage extends BasePage {
             try {
                 d.switchTo().alert();
                 return false;
-            } catch (Exception ignored) {
+            } catch (NoSuchElementException | NoAlertPresentException ignored) {
                 return true;
             }
         });
     }
 
     public WebElement getWebTableSection() {
-        return waitHelper.visibilityOf(WEB_TABLE_SECTION);
+        return find(WEB_TABLE_SECTION);
     }
 
     public void scrollWindowBy(int x, int y) {
