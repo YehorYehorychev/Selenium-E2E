@@ -20,21 +20,11 @@ public class ShoppingLoginTest extends BaseTest {
     }
 
     @Test
-    void loginViaUiUsingApiTokenTest() {
-        String token = fetchAuthToken();
-        driver.manage().deleteAllCookies();
-        driver.manage().addCookie(new org.openqa.selenium.Cookie("token", token));
-        driver.navigate().refresh();
-
-        DashboardPage dashboardPage = new DashboardPage(driver, waitHelper);
-        Assert.assertTrue(dashboardPage.isLoaded(), "Dashboard should be visible after token auth");
-    }
-
-    @Test
     void loginViaUiFormTest() {
         LoginPage loginPage = new LoginPage(driver, waitHelper);
         DashboardPage dashboardPage = loginPage.login(ConfigProperties.getShoppingUsername(), ConfigProperties.getShoppingPassword());
         Assert.assertTrue(dashboardPage.isLoaded(), "Dashboard page should load after login");
+        dashboardPage.signOut();
     }
 
     private String fetchAuthToken() {

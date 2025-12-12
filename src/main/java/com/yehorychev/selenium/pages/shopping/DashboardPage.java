@@ -1,13 +1,14 @@
 package com.yehorychev.selenium.pages.shopping;
 
 import com.yehorychev.selenium.helpers.WaitHelper;
+import com.yehorychev.selenium.pages.common.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class DashboardPage extends ShoppingBasePage {
+public class DashboardPage extends BasePage {
 
-    private static final By USER_GREETING = By.cssSelector(".user-name");
-    private static final By PRODUCT_CARD = By.cssSelector(".card");
+    private static final By HOME_BUTTON = By.xpath("//button[normalize-space()='HOME']");
+    private static final By SIGN_OUT_BUTTON = By.xpath("//button[normalize-space()='Sign Out']");
 
     public DashboardPage(WebDriver driver, WaitHelper waitHelper) {
         super(driver, waitHelper);
@@ -15,11 +16,10 @@ public class DashboardPage extends ShoppingBasePage {
 
     public boolean isLoaded() {
         waitForPageReady();
-        return isVisible(PRODUCT_CARD);
+        return isVisible(HOME_BUTTON) && isVisible(SIGN_OUT_BUTTON);
     }
 
-    public String getGreetingText() {
-        return getText(USER_GREETING);
+    public void signOut() {
+        click(SIGN_OUT_BUTTON);
     }
 }
-

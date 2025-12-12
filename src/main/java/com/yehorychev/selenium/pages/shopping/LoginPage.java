@@ -1,10 +1,11 @@
 package com.yehorychev.selenium.pages.shopping;
 
 import com.yehorychev.selenium.helpers.WaitHelper;
+import com.yehorychev.selenium.pages.common.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class LoginPage extends ShoppingBasePage {
+public class LoginPage extends BasePage {
 
     private static final By EMAIL_INPUT = By.cssSelector("#userEmail");
     private static final By PASSWORD_INPUT = By.cssSelector("#userPassword");
@@ -36,4 +37,3 @@ public class LoginPage extends ShoppingBasePage {
                 .submit();
     }
 }
-
