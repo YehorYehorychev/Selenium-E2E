@@ -38,4 +38,3 @@ public class ShoppingApiLoginTest {
         System.out.println("Response body:\n" + formattedBody);
     }
 }
-
