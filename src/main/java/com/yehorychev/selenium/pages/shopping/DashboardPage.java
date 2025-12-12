@@ -17,6 +17,7 @@ public class DashboardPage extends BasePage {
     private static final By ADD_TO_CART_BUTTON = By.cssSelector(".card-body button:last-of-type");
     private static final By CART_BUTTON = By.cssSelector("button[routerlink='/dashboard/cart']");
     private static final By CART_BADGE = By.cssSelector("button[routerlink='/dashboard/cart'] label");
+    private static final By TEMP_TOAST_MESSAGE = By.cssSelector("#toast-container");
 
     public DashboardPage(WebDriver driver, WaitHelper waitHelper) {
         super(driver, waitHelper);
@@ -55,6 +56,8 @@ public class DashboardPage extends BasePage {
         WebElement addButton = productCard.findElement(ADD_TO_CART_BUTTON);
         log.info("Adding product '{}' to cart", productName);
         addButton.click();
+        waitHelper.visibilityOf(TEMP_TOAST_MESSAGE);
+        waitHelper.waitForElementToDisappear(TEMP_TOAST_MESSAGE);
         waitHelper.waitForAjaxComplete();
     }
 
@@ -69,6 +72,12 @@ public class DashboardPage extends BasePage {
 
     public void waitForCartCount(int expectedCount) {
         waitHelper.waitForTextEquals(CART_BADGE, String.valueOf(expectedCount));
+    }
+
+    public CartPage openCart() {
+        click(CART_BUTTON);
+        waitHelper.waitForPageReady();
+        return new CartPage(driver, waitHelper);
     }
 
     public void signOut() {
