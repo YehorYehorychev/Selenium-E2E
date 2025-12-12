@@ -63,6 +63,15 @@ public class ConfigProperties {
     }
 
     /**
+     * Get the base URL for Shopping Login Page
+     *
+     * @return Shopping Login Page base URL
+     */
+    public static String getShoppingLoginPageUrl() {
+        return getProperty("base.url.shopping");
+    }
+
+    /**
      * Get the base URL for Amazon
      *
      * @return Amazon base URL
