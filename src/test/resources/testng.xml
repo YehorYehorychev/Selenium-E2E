@@ -7,6 +7,7 @@
             <class name="com.yehorychev.selenium.tests.amazon.AmazonTests"/>
             <class name="com.yehorychev.selenium.tests.flightbooking.FlightBookingTests"/>
             <class name="com.yehorychev.selenium.tests.practice.AlertTests"/>
+            <class name="com.yehorychev.selenium.tests.shopping.ShoppingLoginTest"/>
         </classes>
     </test>
 </suite>

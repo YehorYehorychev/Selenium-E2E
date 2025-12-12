@@ -2,6 +2,7 @@ package com.yehorychev.selenium.config;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Properties;
@@ -69,6 +70,19 @@ public class ConfigProperties {
      */
     public static String getShoppingLoginPageUrl() {
         return getProperty("base.url.shopping");
+    }
+
+    public static String getShoppingApiBaseUrl() {
+        URI uri = URI.create(getShoppingLoginPageUrl());
+        return uri.getScheme() + "://" + uri.getHost() + "/api/ecom";
+    }
+
+    public static String getShoppingUsername() {
+        return getProperty("shopping.username");
+    }
+
+    public static String getShoppingPassword() {
+        return getProperty("shopping.password");
     }
 
     /**
