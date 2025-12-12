@@ -133,4 +133,12 @@ public class ConfigProperties {
         }
         return value;
     }
+
+    public static String getShoppingCardNumber() {
+        return getProperty("shopping.card.number");
+    }
+
+    public static String getShoppingCardCvv() {
+        return getProperty("shopping.card.cvv");
+    }
 }

@@ -151,4 +151,19 @@ public abstract class BasePage {
         log.debug("Clearing all cookies");
         driver.manage().deleteAllCookies();
     }
+
+    protected void setLocalStorageItem(String key, String value) {
+        log.debug("Setting localStorage item {}", key);
+        jsExecutor().executeScript("window.localStorage.setItem(arguments[0], arguments[1]);", key, value);
+    }
+
+    protected void clearLocalStorageItem(String key) {
+        log.debug("Removing localStorage item {}", key);
+        jsExecutor().executeScript("window.localStorage.removeItem(arguments[0]);", key);
+    }
+
+    protected void clearLocalStorage() {
+        log.debug("Clearing localStorage");
+        jsExecutor().executeScript("window.localStorage.clear();");
+    }
 }

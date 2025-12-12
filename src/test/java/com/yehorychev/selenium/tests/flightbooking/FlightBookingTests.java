@@ -14,17 +14,17 @@ public class FlightBookingTests extends BaseTest {
 
     @Test
     void flightBookingTest() {
-        FlightBookingHomePage homePage = new FlightBookingHomePage(driver, waitHelper);
+        FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
         homePage.setCurrency("USD");
-        String pageTitle = driver.getTitle();
-        String pageUrl = driver.getCurrentUrl().split("\\?")[0];
+        String pageTitle = driver().getTitle();
+        String pageUrl = driver().getCurrentUrl().split("\\?")[0];
         System.out.printf("The page title is: %s, and the page base URL is: %s", pageTitle, pageUrl);
         Assert.assertEquals(homePage.getSelectedCurrency(), "USD");
     }
 
     @Test
     void flightBookingPassengersDropdownTest() {
-        FlightBookingHomePage homePage = new FlightBookingHomePage(driver, waitHelper);
+        FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
         homePage.openPassengerSelector();
         homePage.addAdults(1);
         homePage.addChildren(2);
@@ -36,7 +36,7 @@ public class FlightBookingTests extends BaseTest {
 
     @Test
     void flightBookingFromToCitiesTest() {
-        FlightBookingHomePage homePage = new FlightBookingHomePage(driver, waitHelper);
+        FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
         homePage.selectOrigin("GOI");
         homePage.selectDestination("BLR");
         Assert.assertEquals(homePage.getSelectedOrigin(), "Goa (GOI)");
@@ -45,7 +45,7 @@ public class FlightBookingTests extends BaseTest {
 
     @Test
     void flightBookingDynamicDropdownTest() {
-        FlightBookingHomePage homePage = new FlightBookingHomePage(driver, waitHelper);
+        FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
         homePage.searchCountry("Br");
         homePage.chooseCountrySuggestion("Virgin Islands (British)");
         Assert.assertEquals(homePage.getSelectedCountry(), "Virgin Islands (British)");

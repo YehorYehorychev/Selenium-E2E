@@ -23,7 +23,7 @@ public class AlertTests extends BaseTest {
 
     @Test
     void dismissAlertTest() {
-        PracticeAlertsPage alertsPage = new PracticeAlertsPage(driver, waitHelper);
+        PracticeAlertsPage alertsPage = new PracticeAlertsPage(driver(), waitHelper());
         alertsPage.enterName("Yehor");
         alertsPage.triggerConfirmAlert();
 
@@ -36,8 +36,8 @@ public class AlertTests extends BaseTest {
 
     @Test
     void scrollPageTest() {
-        PracticeAlertsPage alertsPage = new PracticeAlertsPage(driver, waitHelper);
-        PracticeTableSection tableSection = new PracticeTableSection(driver, waitHelper);
+        PracticeAlertsPage alertsPage = new PracticeAlertsPage(driver(), waitHelper());
+        PracticeTableSection tableSection = new PracticeTableSection(driver(), waitHelper());
 
         alertsPage.scrollWindowBy(0, 500);
         Assert.assertTrue(alertsPage.getWebTableSection().isDisplayed());
@@ -54,7 +54,7 @@ public class AlertTests extends BaseTest {
 
     @Test
     void brokenLinksTest() throws IOException {
-        PracticeFooterSection footerSection = new PracticeFooterSection(driver, waitHelper);
+        PracticeFooterSection footerSection = new PracticeFooterSection(driver(), waitHelper());
         SoftAssert softAssert = new SoftAssert();
 
         List<WebElement> links = footerSection.getFooterLinks();
