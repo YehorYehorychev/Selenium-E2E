@@ -16,20 +16,39 @@ import java.time.Duration;
 
 public abstract class BaseTest {
 
-    protected WebDriver driver;
-    protected WaitHelper waitHelper;
+    private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
+    private static final ThreadLocal<WaitHelper> WAIT_HELPER = new ThreadLocal<>();
+
+    protected WebDriver driver() {
+        WebDriver current = DRIVER.get();
+        if (current == null) {
+            throw new IllegalStateException("WebDriver is not initialized for current thread");
+        }
+        return current;
+    }
+
+    protected WaitHelper waitHelper() {
+        WaitHelper helper = WAIT_HELPER.get();
+        if (helper == null) {
+            throw new IllegalStateException("WaitHelper is not initialized for current thread");
+        }
+        return helper;
+    }
 
     @BeforeMethod(alwaysRun = true)
     @Parameters({"baseUrlKey"})
     public void setUp(@Optional("") String baseUrlKey) {
         ChromeOptions options = buildChromeOptions();
 
-        driver = new ChromeDriver(options);
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+        WebDriver webDriver = new ChromeDriver(options);
+        webDriver.manage().window().maximize();
+        webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
 
-        waitHelper = new WaitHelper(driver, Duration.ofSeconds(5));
-        driver.navigate().to(resolveBaseUrl(baseUrlKey));
+        WaitHelper helper = WaitHelper.fromConfig(webDriver);
+        DRIVER.set(webDriver);
+        WAIT_HELPER.set(helper);
+
+        webDriver.navigate().to(resolveBaseUrl(baseUrlKey));
     }
 
     private String resolveBaseUrl(String overrideKey) {
@@ -51,18 +70,23 @@ public abstract class BaseTest {
 
     @AfterMethod(alwaysRun = true)
     public void tearDown(ITestResult result) {
-        if (driver != null) {
-            try {
+        WebDriver webDriver = DRIVER.get();
+        try {
+            if (webDriver != null) {
                 boolean failuresOnly = ConfigProperties.captureScreenshotsOnFailuresOnly();
                 boolean shouldCapture = !failuresOnly || result.getStatus() == ITestResult.FAILURE;
                 if (shouldCapture) {
-                    ScreenshotHelper.capture(driver, result.getMethod().getMethodName());
+                    ScreenshotHelper.capture(webDriver, result.getMethod().getMethodName());
                 }
-            } catch (RuntimeException screenshotError) {
-                // screenshot failures should not block driver cleanup
-            } finally {
-                driver.quit();
             }
+        } catch (RuntimeException screenshotError) {
+            // screenshot failures should not block driver cleanup
+        } finally {
+            if (webDriver != null) {
+                webDriver.quit();
+            }
+            DRIVER.remove();
+            WAIT_HELPER.remove();
         }
     }
 }

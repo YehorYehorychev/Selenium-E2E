@@ -30,7 +30,7 @@ public class AmazonTests extends BaseTest {
 
     @Test
     void amazonSearchBarTest() {
-        AmazonHomePage homePage = new AmazonHomePage(driver, waitHelper);
+        AmazonHomePage homePage = new AmazonHomePage(driver(), waitHelper());
         AmazonProductResultsPage resultsPage = homePage.searchFor("laptop");
 
         Assert.assertFalse(resultsPage.getSearchResults().isEmpty(), "Search returned no results!");
@@ -40,7 +40,7 @@ public class AmazonTests extends BaseTest {
     @Test
     @Ignore // Ignored due to frequent UI changes on Amazon site
     void amazonActionsTest() {
-        AmazonHomePage homePage = new AmazonHomePage(driver, waitHelper);
+        AmazonHomePage homePage = new AmazonHomePage(driver(), waitHelper());
         homePage.searchFor("laptop");
 
         homePage.hoverOverAccountsAndLists();
@@ -51,7 +51,7 @@ public class AmazonTests extends BaseTest {
 
     @Test
     void amazonCartInNewWindowTest() {
-        AmazonHomePage homePage = new AmazonHomePage(driver, waitHelper);
+        AmazonHomePage homePage = new AmazonHomePage(driver(), waitHelper());
         AmazonCartPage cartPage = homePage.openCartInNewWindow();
 
         Assert.assertTrue(cartPage.isCartHeaderDisplayed());

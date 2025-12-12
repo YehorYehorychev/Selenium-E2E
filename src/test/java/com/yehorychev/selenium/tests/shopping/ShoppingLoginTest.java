@@ -16,7 +16,7 @@ public class ShoppingLoginTest extends BaseTest {
 
     @Test
     void loginViaUiFormTest() {
-        LoginPage loginPage = new LoginPage(driver, waitHelper);
+        LoginPage loginPage = new LoginPage(driver(), waitHelper());
         DashboardPage dashboardPage = loginPage.login(ConfigProperties.getShoppingUsername(), ConfigProperties.getShoppingPassword());
         Assert.assertTrue(dashboardPage.isLoaded(), "Dashboard page should load after login");
         dashboardPage.signOut();

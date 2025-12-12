@@ -37,14 +37,14 @@ public abstract class ShoppingAuthenticatedBaseTest extends BaseTest {
     }
 
     private void injectShoppingToken() {
-        if (!(driver instanceof JavascriptExecutor executor)) {
+        if (!(driver() instanceof JavascriptExecutor executor)) {
             throw new IllegalStateException("Driver must support JS to inject token");
         }
         executor.executeScript("window.localStorage.setItem(arguments[0], arguments[1]);", "token", shoppingSession.token());
         executor.executeScript("window.localStorage.setItem(arguments[0], arguments[1]);", "userEmail", shoppingSession.userEmail());
         executor.executeScript("window.localStorage.setItem(arguments[0], arguments[1]);", "userId", shoppingSession.userId());
-        driver.navigate().refresh();
-        waitHelper.waitForPageReady();
+        driver().navigate().refresh();
+        waitHelper().waitForPageReady();
     }
 
     @Override
@@ -53,7 +53,7 @@ public abstract class ShoppingAuthenticatedBaseTest extends BaseTest {
     }
 
     protected DashboardPage openDashboard() {
-        return new DashboardPage(driver, waitHelper);
+        return new DashboardPage(driver(), waitHelper());
     }
 
     protected ShoppingSession getShoppingSession() {

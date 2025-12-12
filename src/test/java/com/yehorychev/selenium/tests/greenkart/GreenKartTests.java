@@ -16,7 +16,7 @@ public class GreenKartTests extends BaseTest {
 
     @Test
     void addItemToCartAndApplyPromoCodeTest() {
-        GreenKartHomePage homePage = new GreenKartHomePage(driver, waitHelper);
+        GreenKartHomePage homePage = new GreenKartHomePage(driver(), waitHelper());
         homePage.addVegetables(veggiesToAdd);
         Assert.assertTrue(homePage.cartContainsCount(veggiesToAdd.length),
                 "All selected items were not added to the cart.");
@@ -39,7 +39,7 @@ public class GreenKartTests extends BaseTest {
 
     @Test
     void verifyThatTheItemsSortedInCartTest() {
-        GreenKartHomePage homePage = new GreenKartHomePage(driver, waitHelper);
+        GreenKartHomePage homePage = new GreenKartHomePage(driver(), waitHelper());
         homePage.addVegetables(veggiesToAdd);
         Assert.assertTrue(homePage.cartContainsCount(veggiesToAdd.length),
                 "All selected items were not added to the cart.");
@@ -59,7 +59,7 @@ public class GreenKartTests extends BaseTest {
 
     @Test
     void verifyDiscountPricesTest() {
-        GreenKartHomePage homePage = new GreenKartHomePage(driver, waitHelper);
+        GreenKartHomePage homePage = new GreenKartHomePage(driver(), waitHelper());
         TopDealsPage topDealsPage = homePage.openTopDeals();
         topDealsPage.sortNameColumn();
 
