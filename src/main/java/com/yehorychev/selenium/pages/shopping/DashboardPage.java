@@ -14,6 +14,9 @@ public class DashboardPage extends BasePage {
     private static final By SIGN_OUT_BUTTON = By.xpath("//button[normalize-space()='Sign Out']");
     private static final By PRODUCTS_LIST = By.cssSelector(".mb-3");
     private static final By PRODUCT_NAME = By.cssSelector("b");
+    private static final By ADD_TO_CART_BUTTON = By.cssSelector(".card-body button:last-of-type");
+    private static final By CART_BUTTON = By.cssSelector("button[routerlink='/dashboard/cart']");
+    private static final By CART_BADGE = By.cssSelector("button[routerlink='/dashboard/cart'] label");
 
     public DashboardPage(WebDriver driver, WaitHelper waitHelper) {
         super(driver, waitHelper);
@@ -38,6 +41,34 @@ public class DashboardPage extends BasePage {
     public boolean containsProduct(String productName) {
         return getProductNames().stream()
                 .anyMatch(name -> name.equalsIgnoreCase(productName));
+    }
+
+    private WebElement findProductCard(String productName) {
+        return getProductsList().stream()
+                .filter(card -> card.findElement(PRODUCT_NAME).getText().trim().equalsIgnoreCase(productName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Product not found: " + productName));
+    }
+
+    public void addProductToCart(String productName) {
+        WebElement productCard = findProductCard(productName);
+        WebElement addButton = productCard.findElement(ADD_TO_CART_BUTTON);
+        log.info("Adding product '{}' to cart", productName);
+        addButton.click();
+        waitHelper.waitForAjaxComplete();
+    }
+
+    public int getCartCount() {
+        try {
+            String text = find(CART_BADGE).getText().trim();
+            return Integer.parseInt(text);
+        } catch (Exception ignored) {
+            return 0;
+        }
+    }
+
+    public void waitForCartCount(int expectedCount) {
+        waitHelper.waitForTextEquals(CART_BADGE, String.valueOf(expectedCount));
     }
 
     public void signOut() {
