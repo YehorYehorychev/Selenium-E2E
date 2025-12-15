@@ -3,6 +3,7 @@ package com.yehorychev.selenium.core;
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.helpers.ScreenshotHelper;
 import com.yehorychev.selenium.helpers.WaitHelper;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -40,6 +41,7 @@ public abstract class BaseTest {
     public void setUp(@Optional("") String baseUrlKey) {
         ChromeOptions options = buildChromeOptions();
 
+        WebDriverManager.chromedriver().setup();
         WebDriver webDriver = new ChromeDriver(options);
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
