@@ -3,8 +3,6 @@ package com.yehorychev.selenium.pages.practice;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import com.yehorychev.selenium.pages.common.BasePage;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -23,11 +21,11 @@ public class PracticeAlertsPage extends BasePage {
     }
 
     public void triggerConfirmAlert() {
-        click(CONFIRM_BUTTON);
+        safeClick(CONFIRM_BUTTON);
     }
 
     public String readAlertText() {
-        return waitHelper.alertIsPresent().getText();
+        return waitForAlert().getText();
     }
 
     public void dismissAlert() {
@@ -35,14 +33,7 @@ public class PracticeAlertsPage extends BasePage {
     }
 
     public void waitForAlertDismissed() {
-        waitHelper.until(d -> {
-            try {
-                d.switchTo().alert();
-                return false;
-            } catch (NoSuchElementException | NoAlertPresentException ignored) {
-                return true;
-            }
-        });
+        super.waitForAlertDismissed();
     }
 
     public WebElement getWebTableSection() {

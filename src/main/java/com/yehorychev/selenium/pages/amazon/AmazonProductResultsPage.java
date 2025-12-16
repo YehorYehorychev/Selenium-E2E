@@ -28,6 +28,6 @@ public class AmazonProductResultsPage extends BasePage {
     }
 
     public String getSearchBoxValue() {
-        return find(SEARCH_BAR).getAttribute("value");
+        return getAttribute(SEARCH_BAR, "value");
     }
 }

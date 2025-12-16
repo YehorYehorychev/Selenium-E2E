@@ -21,8 +21,9 @@ public class CheckoutPage extends BasePage {
     }
 
     public List<String> getProductNames(int expectedCount) {
-        List<WebElement> elements = waitHelper.numberOfElementsToBe(PRODUCT_NAME, expectedCount);
-        return elements.stream().map(element -> element.getText().trim()).collect(Collectors.toList());
+        return waitForElementsCount(PRODUCT_NAME, expectedCount).stream()
+                .map(element -> element.getText().trim())
+                .collect(Collectors.toList());
     }
 
     public void applyPromoCode(String promoCode) {

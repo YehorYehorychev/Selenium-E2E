@@ -41,7 +41,7 @@ public class GreenKartHomePage extends BasePage {
     public TopDealsPage openTopDeals() {
         String parentWindow = driver.getWindowHandle();
         safeClick(TOP_DEALS);
-        waitHelper.switchToNewChildWindow();
+        switchToNewChildWindow();
         return new TopDealsPage(driver, waitHelper, parentWindow);
     }
 

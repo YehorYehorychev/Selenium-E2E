@@ -14,7 +14,7 @@ public class CartOverlay extends BasePage {
     }
 
     public CheckoutPage proceedToCheckout() {
-        click(PROCEED_TO_CHECKOUT);
+        safeClick(PROCEED_TO_CHECKOUT);
         return new CheckoutPage(driver, waitHelper);
     }
 }

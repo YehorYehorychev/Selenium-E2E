@@ -26,15 +26,13 @@ public class FlightBookingHomePage extends BasePage {
     }
 
     public void setCurrency(String currencyCode) {
-        WebElement dropdownElement = find(CURRENCY_DROPDOWN);
-        Select dropdown = new Select(dropdownElement);
+        Select dropdown = new Select(find(CURRENCY_DROPDOWN));
         dropdown.selectByVisibleText(currencyCode);
-        waitHelper.until(d -> currencyCode.equalsIgnoreCase(dropdown.getFirstSelectedOption().getText().trim()));
+        waitUntil(d -> currencyCode.equalsIgnoreCase(dropdown.getFirstSelectedOption().getText().trim()));
     }
 
     public String getSelectedCurrency() {
-        Select dropdown = new Select(find(CURRENCY_DROPDOWN));
-        return dropdown.getFirstSelectedOption().getText();
+        return new Select(find(CURRENCY_DROPDOWN)).getFirstSelectedOption().getText();
     }
 
     public void openPassengerSelector() {
@@ -42,16 +40,14 @@ public class FlightBookingHomePage extends BasePage {
     }
 
     public void addAdults(int count) {
-        WebElement adultPlus = waitHelper.visibilityOf(ADULT_PLUS_BTN);
         for (int i = 0; i < count; i++) {
-            adultPlus.click();
+            click(ADULT_PLUS_BTN);
         }
     }
 
     public void addChildren(int count) {
-        WebElement childPlus = waitHelper.visibilityOf(CHILD_PLUS_BTN);
         for (int i = 0; i < count; i++) {
-            childPlus.click();
+            click(CHILD_PLUS_BTN);
         }
     }
 
@@ -65,36 +61,35 @@ public class FlightBookingHomePage extends BasePage {
 
     public void selectOrigin(String cityCode) {
         click(ORIGIN_INPUT);
-        click(By.xpath("//a[@value='" + cityCode + "']"));
+        safeClick(By.xpath("//a[@value='" + cityCode + "']"));
     }
 
     public void selectDestination(String cityCode) {
         click(DESTINATION_INPUT);
-        click(By.xpath("//a[@value='" + cityCode + "']"));
+        safeClick(By.xpath("//a[@value='" + cityCode + "']"));
     }
 
     public String getSelectedOrigin() {
-        return find(ORIGIN_INPUT).getAttribute("value");
+        return getAttribute(ORIGIN_INPUT, "value");
     }
 
     public String getSelectedDestination() {
-        return find(DESTINATION_INPUT).getAttribute("value");
+        return getAttribute(DESTINATION_INPUT, "value");
     }
 
     public void searchCountry(String partialName) {
         type(COUNTRY_AUTOSUGGEST, partialName);
-        waitHelper.visibilityOfAllElements(COUNTRY_SUGGESTIONS);
+        findAll(COUNTRY_SUGGESTIONS);
     }
 
     public void chooseCountrySuggestion(String countryName) {
-        List<WebElement> suggestions = findAll(COUNTRY_SUGGESTIONS);
-        suggestions.stream()
+        findAll(COUNTRY_SUGGESTIONS).stream()
                 .filter(option -> option.getText().equalsIgnoreCase(countryName))
                 .findFirst()
                 .ifPresent(WebElement::click);
     }
 
     public String getSelectedCountry() {
-        return find(COUNTRY_AUTOSUGGEST).getAttribute("value");
+        return getAttribute(COUNTRY_AUTOSUGGEST, "value");
     }
 }
