@@ -29,7 +29,7 @@ public class DashboardPage extends BasePage {
     }
 
     public List<WebElement> getProductsList() {
-        waitForAjaxComplete();
+        waitForPageReadyAndAjax();
         return findAll(PRODUCTS_LIST);
     }
 
@@ -56,27 +56,25 @@ public class DashboardPage extends BasePage {
         WebElement addButton = productCard.findElement(ADD_TO_CART_BUTTON);
         log.info("Adding product '{}' to cart", productName);
         addButton.click();
-        waitHelper.visibilityOf(TEMP_TOAST_MESSAGE);
-        waitHelper.waitForElementToDisappear(TEMP_TOAST_MESSAGE);
-        waitHelper.waitForAjaxComplete();
+        waitForPageReadyAndAjax();
+        waitForElementToDisappear(TEMP_TOAST_MESSAGE);
     }
 
     public int getCartCount() {
         try {
-            String text = find(CART_BADGE).getText().trim();
-            return Integer.parseInt(text);
-        } catch (Exception ignored) {
+            return Integer.parseInt(getText(CART_BADGE).trim());
+        } catch (RuntimeException ignored) {
             return 0;
         }
     }
 
     public void waitForCartCount(int expectedCount) {
-        waitHelper.waitForTextEquals(CART_BADGE, String.valueOf(expectedCount));
+        waitForTextEquals(CART_BADGE, String.valueOf(expectedCount));
     }
 
     public CartPage openCart() {
-        click(CART_BUTTON);
-        waitHelper.waitForPageReady();
+        safeClick(CART_BUTTON);
+        waitForPageReady();
         return new CartPage(driver, waitHelper);
     }
 
