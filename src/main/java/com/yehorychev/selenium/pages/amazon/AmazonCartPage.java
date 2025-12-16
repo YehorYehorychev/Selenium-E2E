@@ -22,7 +22,7 @@ public class AmazonCartPage extends BasePage {
     }
 
     public AmazonHomePage returnToParentWindow() {
-        waitHelper.switchToParentWindow(parentWindowHandle);
+        switchToParentWindow(parentWindowHandle);
         return new AmazonHomePage(driver, waitHelper);
     }
 }

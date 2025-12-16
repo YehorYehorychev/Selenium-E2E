@@ -17,6 +17,8 @@ import java.time.Duration;
 
 public abstract class BaseTest {
 
+    // Thread-local storage for WebDriver and WaitHelper instances,
+    // ensuring thread safety during parallel test execution.
     private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
     private static final ThreadLocal<WaitHelper> WAIT_HELPER = new ThreadLocal<>();
 

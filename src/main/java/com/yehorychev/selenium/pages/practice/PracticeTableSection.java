@@ -25,7 +25,7 @@ public class PracticeTableSection extends BasePage {
     }
 
     public List<String> readFourthRowValues() {
-        List<WebElement> rows = waitHelper.presenceOfAllElements(FIXED_HEADER_ROWS);
+        List<WebElement> rows = findAllPresent(FIXED_HEADER_ROWS);
         if (rows.size() < 4) {
             return new ArrayList<>();
         }
@@ -34,7 +34,7 @@ public class PracticeTableSection extends BasePage {
     }
 
     public List<String> readFourthColumnValues() {
-        return waitHelper.presenceOfAllElements(By.cssSelector(".tableFixHead td:nth-child(4)")).stream()
+        return findAllPresent(By.cssSelector(".tableFixHead td:nth-child(4)")).stream()
                 .map(WebElement::getText)
                 .collect(Collectors.toList());
     }

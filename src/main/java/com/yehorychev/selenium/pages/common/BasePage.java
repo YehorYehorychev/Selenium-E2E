@@ -11,6 +11,7 @@ import org.testng.Assert;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class BasePage {
@@ -51,9 +52,19 @@ public abstract class BasePage {
         return waitHelper.visibilityOf(locator);
     }
 
+    protected WebElement findPresent(By locator) {
+        log.debug("Finding present element: {}", locator);
+        return waitHelper.forLocator(locator).present().get();
+    }
+
     protected List<WebElement> findAll(By locator) {
         log.debug("Finding all visible elements: {}", locator);
         return waitHelper.visibilityOfAllElements(locator);
+    }
+
+    protected List<WebElement> findAllPresent(By locator) {
+        log.debug("Finding all present elements: {}", locator);
+        return waitHelper.presenceOfAllElements(locator);
     }
 
     protected WebElement findMatching(By locator, Predicate<WebElement> predicate, String description) {
@@ -160,6 +171,11 @@ public abstract class BasePage {
         waitHelper.waitForElementsGreaterThan(locator, count);
     }
 
+    protected List<WebElement> waitForElementsCount(By locator, int expected) {
+        log.debug("Waiting for exactly {} elements located by {}", expected, locator);
+        return waitHelper.numberOfElementsToBe(locator, expected);
+    }
+
     protected void waitForNumberOfWindows(int expected) {
         waitHelper.waitForNumberOfWindows(expected);
     }
@@ -176,9 +192,21 @@ public abstract class BasePage {
         waitHelper.waitForAjaxComplete();
     }
 
+    protected <T> T waitUntil(Function<WebDriver, T> condition) {
+        return waitHelper.until(condition);
+    }
+
     protected void waitForPageReadyAndAjax() {
         waitForPageReady();
         waitForAjaxComplete();
+    }
+
+    protected Alert waitForAlert() {
+        return waitHelper.alertIsPresent();
+    }
+
+    protected void waitForAlertDismissed() {
+        waitHelper.waitForAlertDismissed();
     }
 
     protected void assertTextEquals(By locator, String expected) {
@@ -230,6 +258,14 @@ public abstract class BasePage {
             }
         }
         throw new IllegalArgumentException("Window not found: " + titleOrHandle);
+    }
+
+    protected void switchToNewChildWindow() {
+        waitHelper.switchToNewChildWindow();
+    }
+
+    protected void switchToParentWindow(String handle) {
+        waitHelper.switchToParentWindow(handle);
     }
 
     protected void switchToFrame(By locator) {

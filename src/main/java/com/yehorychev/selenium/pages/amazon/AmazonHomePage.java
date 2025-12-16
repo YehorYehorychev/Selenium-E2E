@@ -28,8 +28,7 @@ public class AmazonHomePage extends BasePage {
     }
 
     public void hoverOverAccountsAndLists() {
-        WebElement element = find(ACCOUNTS_AND_LISTS);
-        actions().moveToElement(element).perform();
+        hover(ACCOUNTS_AND_LISTS);
     }
 
     public void openWatchlist() {
@@ -42,9 +41,8 @@ public class AmazonHomePage extends BasePage {
 
     public AmazonCartPage openCartInNewWindow() {
         String parentWindow = driver.getWindowHandle();
-        WebElement cart = find(CART_ICON);
-        actions().keyDown(platformControlKey()).moveToElement(cart).click().keyUp(platformControlKey()).perform();
-        waitHelper.switchToNewChildWindow();
+        openLinkInNewTab(CART_ICON);
+        switchToNewChildWindow();
         return new AmazonCartPage(driver, waitHelper, parentWindow);
     }
 

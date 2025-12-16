@@ -17,7 +17,6 @@ public class PracticeFooterSection extends BasePage {
     }
 
     public List<WebElement> getFooterLinks() {
-        return waitHelper.presenceOfAllElements(FOOTER_LINKS);
+        return findAllPresent(FOOTER_LINKS);
     }
 }
-

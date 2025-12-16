@@ -43,7 +43,7 @@ public class TopDealsPage extends BasePage {
                     .collect(Collectors.toList());
 
             if (prices.isEmpty()) {
-                click(NEXT_BUTTON);
+                safeClick(NEXT_BUTTON);
             }
         } while (prices.isEmpty());
 
@@ -56,6 +56,6 @@ public class TopDealsPage extends BasePage {
 
     public void closeAndReturn() {
         driver.close();
-        waitHelper.switchToParentWindow(parentWindowHandle);
+        switchToParentWindow(parentWindowHandle);
     }
 }

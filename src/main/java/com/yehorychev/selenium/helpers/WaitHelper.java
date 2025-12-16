@@ -4,6 +4,7 @@ import com.yehorychev.selenium.config.ConfigProperties;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
@@ -109,6 +110,18 @@ public class WaitHelper {
             long jqueryActive = toLong(executor.executeScript("return window.jQuery ? jQuery.active : 0"));
             long fetchInflight = toLong(executor.executeScript("return window.___fetchInFlight || 0"));
             return jqueryActive + fetchInflight == 0;
+        });
+    }
+
+    public void waitForAlertDismissed() {
+        log.debug("Waiting for alert to be dismissed");
+        until(driver -> {
+            try {
+                driver.switchTo().alert();
+                return false;
+            } catch (NoAlertPresentException ignored) {
+                return true;
+            }
         });
     }
 
