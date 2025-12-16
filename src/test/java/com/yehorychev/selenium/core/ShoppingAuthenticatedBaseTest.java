@@ -23,9 +23,9 @@ public abstract class ShoppingAuthenticatedBaseTest extends BaseTest {
 
     @BeforeMethod(alwaysRun = true)
     @Override
-    @Parameters({"baseUrlKey"})
-    public void setUp(@Optional("") String baseUrlKey) {
-        super.setUp(baseUrlKey);
+    @Parameters({"baseUrlKey", "browser"})
+    public void setUp(@Optional("") String baseUrlKey, @Optional("") String browserParam) {
+        super.setUp(baseUrlKey, browserParam);
         if (shoppingSession == null) {
             shoppingSession = requestSession();
         }

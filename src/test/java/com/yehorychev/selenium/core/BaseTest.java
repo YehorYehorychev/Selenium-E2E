@@ -7,6 +7,10 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -39,12 +43,10 @@ public abstract class BaseTest {
     }
 
     @BeforeMethod(alwaysRun = true)
-    @Parameters({"baseUrlKey"})
-    public void setUp(@Optional("") String baseUrlKey) {
-        ChromeOptions options = buildChromeOptions();
-
-        WebDriverManager.chromedriver().setup();
-        WebDriver webDriver = new ChromeDriver(options);
+    @Parameters({"baseUrlKey", "browser"})
+    public void setUp(@Optional("") String baseUrlKey, @Optional("") String browserParam) {
+        BrowserType browserType = resolveBrowserType(browserParam);
+        WebDriver webDriver = createWebDriver(browserType);
         webDriver.manage().window().maximize();
         webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
 
@@ -53,6 +55,37 @@ public abstract class BaseTest {
         WAIT_HELPER.set(helper);
 
         webDriver.navigate().to(resolveBaseUrl(baseUrlKey));
+    }
+
+    private BrowserType resolveBrowserType(String browserParam) {
+        String selection = firstNonBlank(browserParam, ConfigProperties.getBrowserOverride(), ConfigProperties.getDefaultBrowser());
+        return BrowserType.from(selection);
+    }
+
+    private WebDriver createWebDriver(BrowserType browserType) {
+        return switch (browserType) {
+            case FIREFOX -> {
+                WebDriverManager.firefoxdriver().setup();
+                yield new FirefoxDriver(buildFirefoxOptions());
+            }
+            case SAFARI -> new SafariDriver(buildSafariOptions());
+            case CHROME -> {
+                WebDriverManager.chromedriver().setup();
+                yield new ChromeDriver(buildChromeOptions());
+            }
+        };
+    }
+
+    private static String firstNonBlank(String... values) {
+        if (values == null) {
+            return "";
+        }
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value.trim();
+            }
+        }
+        return "";
     }
 
     private String resolveBaseUrl(String overrideKey) {
@@ -69,6 +102,19 @@ public abstract class BaseTest {
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
         options.setExperimentalOption("useAutomationExtension", false);
+        return options;
+    }
+
+    protected FirefoxOptions buildFirefoxOptions() {
+        FirefoxOptions options = new FirefoxOptions();
+        options.addArguments("-private");
+        return options;
+    }
+
+    protected SafariOptions buildSafariOptions() {
+        SafariOptions options = new SafariOptions();
+        options.setAutomaticInspection(false);
+        options.setAutomaticProfiling(false);
         return options;
     }
 
@@ -91,6 +137,23 @@ public abstract class BaseTest {
             }
             DRIVER.remove();
             WAIT_HELPER.remove();
+        }
+    }
+
+    protected enum BrowserType {
+        CHROME,
+        FIREFOX,
+        SAFARI;
+
+        static BrowserType from(String value) {
+            if (value == null || value.isBlank()) {
+                return CHROME;
+            }
+            try {
+                return BrowserType.valueOf(value.trim().toUpperCase());
+            } catch (IllegalArgumentException ex) {
+                throw new IllegalArgumentException("Unsupported browser: " + value + ". Supported: " + java.util.Arrays.toString(values()), ex);
+            }
         }
     }
 }
