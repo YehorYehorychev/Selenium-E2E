@@ -18,6 +18,7 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
 import java.time.Duration;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class BaseTest {
 
@@ -25,6 +26,8 @@ public abstract class BaseTest {
     // ensuring thread safety during parallel test execution.
     private static final ThreadLocal<WebDriver> DRIVER = new ThreadLocal<>();
     private static final ThreadLocal<WaitHelper> WAIT_HELPER = new ThreadLocal<>();
+    private static final ReentrantLock SAFARI_LOCK = new ReentrantLock();
+    private static final ThreadLocal<Boolean> SAFARI_LOCK_HELD = ThreadLocal.withInitial(() -> false);
 
     protected WebDriver driver() {
         WebDriver current = DRIVER.get();
@@ -46,15 +49,32 @@ public abstract class BaseTest {
     @Parameters({"baseUrlKey", "browser"})
     public void setUp(@Optional("") String baseUrlKey, @Optional("") String browserParam) {
         BrowserType browserType = resolveBrowserType(browserParam);
-        WebDriver webDriver = createWebDriver(browserType);
-        webDriver.manage().window().maximize();
-        webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
+        lockSafariIfNeeded(browserType);
+        WebDriver webDriver = null;
+        try {
+            webDriver = createWebDriver(browserType);
+            webDriver.manage().window().maximize();
+            webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(0));
 
-        WaitHelper helper = WaitHelper.fromConfig(webDriver);
-        DRIVER.set(webDriver);
-        WAIT_HELPER.set(helper);
+            WaitHelper helper = WaitHelper.fromConfig(webDriver);
+            DRIVER.set(webDriver);
+            WAIT_HELPER.set(helper);
 
-        webDriver.navigate().to(resolveBaseUrl(baseUrlKey));
+            webDriver.navigate().to(resolveBaseUrl(baseUrlKey));
+        } catch (RuntimeException e) {
+            if (webDriver != null) {
+                webDriver.quit();
+            }
+            releaseSafariLockIfHeld();
+            throw e;
+        }
+    }
+
+    private void lockSafariIfNeeded(BrowserType browserType) {
+        if (browserType == BrowserType.SAFARI) {
+            SAFARI_LOCK.lock();
+            SAFARI_LOCK_HELD.set(true);
+        }
     }
 
     private BrowserType resolveBrowserType(String browserParam) {
@@ -137,6 +157,14 @@ public abstract class BaseTest {
             }
             DRIVER.remove();
             WAIT_HELPER.remove();
+            releaseSafariLockIfHeld();
+        }
+    }
+
+    private void releaseSafariLockIfHeld() {
+        if (Boolean.TRUE.equals(SAFARI_LOCK_HELD.get())) {
+            SAFARI_LOCK_HELD.set(false);
+            SAFARI_LOCK.unlock();
         }
     }
 
