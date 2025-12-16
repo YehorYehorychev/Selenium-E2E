@@ -18,34 +18,34 @@ public class CartPage extends BasePage {
     }
 
     public boolean isLoaded() {
-        waitForPageReady();
+        waitForPageReadyAndAjax();
         return isVisible(BUY_NOW_BUTTON) && isVisible(CHECKOUT_BUTTON);
     }
 
     public String getFirstProductName() {
-        waitHelper.visibilityOf(PRODUCT_ROWS);
-        return find(PRODUCT_NAME).getText().trim();
+        waitForPageReady();
+        return getText(PRODUCT_NAME).trim();
     }
 
     public String getFirstProductPrice() {
-        waitHelper.visibilityOf(PRODUCT_PRICE);
-        return find(PRODUCT_PRICE).getText().trim();
+        waitForPageReady();
+        return getText(PRODUCT_PRICE).trim();
     }
 
     public String getSubtotal() {
-        waitHelper.visibilityOf(PRODUCT_ROWS);
-        return find(PRODUCT_PRICE).getText().trim();
+        waitForPageReady();
+        return getText(PRODUCT_PRICE).trim();
     }
 
     public String getTotal() {
-        waitHelper.visibilityOf(PRODUCT_PRICE);
-        return find(PRODUCT_PRICE).getText().trim();
+        waitForPageReady();
+        return getText(PRODUCT_PRICE).trim();
     }
 
     public CheckoutPage openCheckoutPage() {
-        waitHelper.visibilityOf(CHECKOUT_BUTTON);
-        click(CHECKOUT_BUTTON);
-        waitHelper.waitForPageReady();
+        waitForPageReady();
+        safeClick(CHECKOUT_BUTTON);
+        waitForPageReady();
         return new CheckoutPage(driver, waitHelper);
     }
 }

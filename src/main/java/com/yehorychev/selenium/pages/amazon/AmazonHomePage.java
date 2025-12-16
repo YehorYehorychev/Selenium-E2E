@@ -33,7 +33,7 @@ public class AmazonHomePage extends BasePage {
     }
 
     public void openWatchlist() {
-        click(WATCHLIST_LINK);
+        safeClick(WATCHLIST_LINK);
     }
 
     public boolean isSignInHeaderDisplayed() {
@@ -49,7 +49,6 @@ public class AmazonHomePage extends BasePage {
     }
 
     public boolean isShopGiftCategoryVisible() {
-        driver.switchTo().window(driver.getWindowHandle());
         waitForPageReady();
         return isVisible(SHOP_GIFT_CATEGORY_HEADER);
     }

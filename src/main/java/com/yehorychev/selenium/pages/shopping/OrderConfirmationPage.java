@@ -29,17 +29,17 @@ public class OrderConfirmationPage extends BasePage {
     }
 
     public String getProductName() {
-        waitHelper.visibilityOf(PRODUCT_NAME);
+        waitForPageReadyAndAjax();
         return getText(PRODUCT_NAME);
     }
 
     public String getProductPrice() {
-        waitHelper.visibilityOf(PRODUCT_PRICE);
+        waitForPageReadyAndAjax();
         return getText(PRODUCT_PRICE);
     }
 
     public String getOrderNumber() {
-        waitHelper.visibilityOf(ORDER_NUMBER_TEXT);
+        waitForPageReady();
         return getText(ORDER_NUMBER_TEXT).trim();
     }
 

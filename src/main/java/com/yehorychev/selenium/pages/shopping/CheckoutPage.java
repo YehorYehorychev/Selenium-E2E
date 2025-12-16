@@ -35,12 +35,12 @@ public class CheckoutPage extends BasePage {
     }
 
     public String getProductName() {
-        waitHelper.visibilityOf(PRODUCT_SECTION);
+        waitForPageReadyAndAjax();
         return getText(PRODUCT_NAME);
     }
 
     public String getProductPrice() {
-        waitHelper.visibilityOf(PRODUCT_SECTION);
+        waitForPageReadyAndAjax();
         return getText(PRODUCT_PRICE);
     }
 
@@ -70,29 +70,27 @@ public class CheckoutPage extends BasePage {
     }
 
     public CheckoutPage selectExpiryMonth(String monthValue) {
-        new Select(find(CARD_EXPIRATION_FROM)).selectByVisibleText(monthValue);
+        selectByVisibleText(CARD_EXPIRATION_FROM, monthValue);
         return this;
     }
 
     public CheckoutPage selectExpiryYear(String yearValue) {
-        new Select(find(CARD_EXPIRATION_TO)).selectByVisibleText(yearValue);
+        selectByVisibleText(CARD_EXPIRATION_TO, yearValue);
         return this;
     }
 
     public CheckoutPage selectCountry(String query, String optionToSelect) {
         type(SELECT_COUNTRY_FIELD, query);
-        waitHelper.visibilityOf(COUNTRY_OPTIONS);
-        List<WebElement> options = findAll(COUNTRY_OPTIONS);
-        WebElement match = options.stream()
-                .filter(element -> element.getText().trim().equalsIgnoreCase(optionToSelect))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Country option not found: " + optionToSelect));
+        waitForPageReadyAndAjax();
+        WebElement match = findMatching(COUNTRY_OPTIONS,
+                element -> element.getText().trim().equalsIgnoreCase(optionToSelect),
+                "country option '" + optionToSelect + "'");
         match.click();
         return this;
     }
 
     public void placeOrder() {
-        waitHelper.visibilityOf(PLACE_ORDER_BUTTON);
-        click(PLACE_ORDER_BUTTON);
+        waitForPageReadyAndAjax();
+        safeClick(PLACE_ORDER_BUTTON);
     }
 }

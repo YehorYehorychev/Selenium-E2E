@@ -6,8 +6,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import java.util.Arrays;
-
 public class GreenKartHomePage extends BasePage {
 
     private static final By CART_COUNT_LOCATOR = By.cssSelector("div.cart-info td:nth-child(3) strong");
@@ -25,8 +23,8 @@ public class GreenKartHomePage extends BasePage {
         for (int i = 0; i < names.length; i++) {
             String veggie = names[i];
             By addToCartButton = By.xpath("//h4[contains(text(), '" + veggie + "')]/following::button[text()='ADD TO CART']");
-            click(addToCartButton);
-            waitHelper.waitForTextEquals(CART_COUNT_LOCATOR, String.valueOf(i + 1));
+            safeClick(addToCartButton);
+            waitForTextEquals(CART_COUNT_LOCATOR, String.valueOf(i + 1));
         }
     }
 
@@ -36,13 +34,13 @@ public class GreenKartHomePage extends BasePage {
     }
 
     public CartOverlay openCartOverlay() {
-        click(CART_ICON);
+        safeClick(CART_ICON);
         return new CartOverlay(driver, waitHelper);
     }
 
     public TopDealsPage openTopDeals() {
         String parentWindow = driver.getWindowHandle();
-        click(TOP_DEALS);
+        safeClick(TOP_DEALS);
         waitHelper.switchToNewChildWindow();
         return new TopDealsPage(driver, waitHelper, parentWindow);
     }
