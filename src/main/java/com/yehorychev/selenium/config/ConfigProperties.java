@@ -112,6 +112,14 @@ public class ConfigProperties {
         return Boolean.parseBoolean(getProperty("screenshot.failures.only"));
     }
 
+    public static String getDefaultBrowser() {
+        return properties.getProperty("browser.default", "chrome").trim();
+    }
+
+    public static String getBrowserOverride() {
+        return System.getProperty("browser", System.getenv().getOrDefault("BROWSER", ""));
+    }
+
     public static Duration getDefaultWaitTimeout() {
         return Duration.ofSeconds(Long.parseLong(getProperty("wait.default.seconds")));
     }
