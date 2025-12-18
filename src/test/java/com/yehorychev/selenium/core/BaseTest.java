@@ -4,6 +4,8 @@ import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.helpers.ScreenshotHelper;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.qameta.allure.Allure;
+import io.qameta.allure.SeverityLevel;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -12,12 +14,14 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 import org.testng.ITestResult;
+import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.concurrent.locks.ReentrantLock;
@@ -150,7 +154,12 @@ public abstract class BaseTest {
                 boolean shouldCapture = !failuresOnly || result.getStatus() == ITestResult.FAILURE;
                 if (shouldCapture) {
                     Path screenshotPath = ScreenshotHelper.capture(webDriver, result.getMethod().getMethodName());
-                    attachScreenshotToAllure(screenshotPath);
+                    attachFileToAllure(screenshotPath, "image/png");
+                }
+                if (result.getStatus() == ITestResult.FAILURE) {
+                    Path pageSource = ScreenshotHelper.capturePageSource(webDriver, result.getMethod().getMethodName());
+                    attachFileToAllure(pageSource, "text/html");
+                    attachConsoleLogs(webDriver);
                 }
             }
         } catch (RuntimeException screenshotError) {
@@ -166,18 +175,28 @@ public abstract class BaseTest {
         }
     }
 
-    private void setTestDriverAttribute(WebDriver driver) {
-        ITestResult currentResult = org.testng.Reporter.getCurrentTestResult();
-        if (currentResult != null) {
-            currentResult.setAttribute("driver", driver);
+    protected void annotateDataSet(String description, SeverityLevel severity) {
+        Allure.description(description);
+        Allure.getLifecycle().updateTestCase(testResult -> testResult.setDescription(description));
+        Allure.label("severity", severity.value());
+    }
+
+    private void attachFileToAllure(Path path, String mimeType) {
+        try (var input = Files.newInputStream(path)) {
+            Allure.addAttachment(path.getFileName().toString(), mimeType, input, path.toString().endsWith(".html") ? "html" : "png");
+        } catch (IOException ignored) {
+            // ignore attachment failures
         }
     }
 
-    private void attachScreenshotToAllure(Path screenshotPath) {
-        try (var input = java.nio.file.Files.newInputStream(screenshotPath)) {
-            io.qameta.allure.Allure.addAttachment(screenshotPath.getFileName().toString(), "image/png", input, "png");
-        } catch (IOException ignored) {
-            // ignore attachment failures
+    private void attachConsoleLogs(WebDriver webDriver) {
+        try {
+            var logs = webDriver.manage().logs().get("browser");
+            StringBuilder builder = new StringBuilder();
+            logs.forEach(entry -> builder.append(entry.getLevel()).append(": ").append(entry.getMessage()).append(System.lineSeparator()));
+            Allure.addAttachment("Browser console", builder.toString());
+        } catch (Exception ignored) {
+            // some drivers may not support log retrieval
         }
     }
 
@@ -185,6 +204,13 @@ public abstract class BaseTest {
         if (Boolean.TRUE.equals(SAFARI_LOCK_HELD.get())) {
             SAFARI_LOCK_HELD.set(false);
             SAFARI_LOCK.unlock();
+        }
+    }
+
+    private void setTestDriverAttribute(WebDriver driver) {
+        ITestResult currentResult = Reporter.getCurrentTestResult();
+        if (currentResult != null) {
+            currentResult.setAttribute("driver", driver);
         }
     }
 

@@ -82,4 +82,21 @@ public final class ScreenshotHelper {
             throw new RuntimeException("Failed to capture viewport screenshot", e);
         }
     }
+
+    public static Path capturePageSource(WebDriver driver, String testName) {
+        if (driver == null) {
+            throw new IllegalArgumentException("WebDriver must not be null when capturing page source");
+        }
+        try {
+            Path directory = ConfigProperties.getScreenshotDirectory();
+            Files.createDirectories(directory);
+            String timestamp = LocalDateTime.now().format(FORMATTER);
+            String safeName = testName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            Path destination = directory.resolve(timestamp + "-" + safeName + ".html");
+            Files.writeString(destination, driver.getPageSource());
+            return destination;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to capture page source for test: " + testName, e);
+        }
+    }
 }
