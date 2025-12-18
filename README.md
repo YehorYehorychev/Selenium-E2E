@@ -1,4 +1,4 @@
-# Selenium Framework
+# Selenium Framework 2026
 
 ## Overview
 Modular UI/API automation framework built with Java 25, Maven, and TestNG. It exercises Page Object Model, data-driven testing, and hybrid UI/API flows across several sample applications (GreenKart, Shopping, Amazon, Flight Booking, etc.). The stack shares a common `BaseTest`, extensible Page Objects, reusable helpers (waits, screenshots, API), and Allure reporting.
