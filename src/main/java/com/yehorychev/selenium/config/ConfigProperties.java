@@ -149,4 +149,12 @@ public class ConfigProperties {
     public static String getShoppingCardCvv() {
         return getProperty("shopping.card.cvv");
     }
+
+    public static boolean isFullPageScreenshotsEnabled() {
+        return Boolean.parseBoolean(properties.getProperty("screenshot.fullpage.enabled", "true"));
+    }
+
+    public static long getFullPageScrollTimeoutMillis() {
+        return Long.parseLong(properties.getProperty("screenshot.fullpage.scroll.timeout.millis", "100"));
+    }
 }

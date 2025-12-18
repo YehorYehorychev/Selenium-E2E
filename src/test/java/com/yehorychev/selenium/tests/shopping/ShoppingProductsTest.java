@@ -55,6 +55,6 @@ public class ShoppingProductsTest extends ShoppingAuthenticatedBaseTest {
         Assert.assertEquals(confirmationPage.getProductPrice(), testData.productPrice());
         Assert.assertTrue(confirmationPage.isThankYouMessageDisplayed(), "Thank you message should be visible");
         Assert.assertTrue(confirmationPage.isDownloadButtonVisible(), "Download button should be visible");
-        Assert.assertFalse(confirmationPage.getOrderNumber().isBlank(), "Order number must be present");
+        Assert.assertTrue(confirmationPage.getOrderNumber().equalsIgnoreCase("Yehor"), "Order number must be present");
     }
 }
