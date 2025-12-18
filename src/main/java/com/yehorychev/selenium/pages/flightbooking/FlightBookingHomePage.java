@@ -7,7 +7,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FlightBookingHomePage extends BasePage {
 
@@ -20,6 +21,8 @@ public class FlightBookingHomePage extends BasePage {
     private static final By DESTINATION_INPUT = By.id("ctl00_mainContent_ddl_destinationStation1_CTXT");
     private static final By COUNTRY_AUTOSUGGEST = By.id("autosuggest");
     private static final By COUNTRY_SUGGESTIONS = By.xpath("//li[@class='ui-menu-item']/a");
+    private static final Pattern ADULT_PATTERN = Pattern.compile("(\\d+)\\s+Adult");
+    private static final Pattern CHILD_PATTERN = Pattern.compile("(\\d+)\\s+Child");
 
     public FlightBookingHomePage(WebDriver driver, WaitHelper waitHelper) {
         super(driver, waitHelper);
@@ -39,16 +42,18 @@ public class FlightBookingHomePage extends BasePage {
         click(PASSENGER_INFO);
     }
 
-    public void addAdults(int count) {
-        for (int i = 0; i < count; i++) {
-            click(ADULT_PLUS_BTN);
+    public void addAdults(int desiredCount) {
+        if (desiredCount < 1) {
+            throw new IllegalArgumentException("At least one adult is required");
         }
+        adjustPassengerCount(desiredCount, getCurrentAdults(), ADULT_PLUS_BTN);
     }
 
-    public void addChildren(int count) {
-        for (int i = 0; i < count; i++) {
-            click(CHILD_PLUS_BTN);
+    public void addChildren(int desiredCount) {
+        if (desiredCount < 0) {
+            throw new IllegalArgumentException("Children count cannot be negative");
         }
+        adjustPassengerCount(desiredCount, getCurrentChildren(), CHILD_PLUS_BTN);
     }
 
     public void confirmPassengers() {
@@ -91,5 +96,27 @@ public class FlightBookingHomePage extends BasePage {
 
     public String getSelectedCountry() {
         return getAttribute(COUNTRY_AUTOSUGGEST, "value");
+    }
+
+    private void adjustPassengerCount(int desired, int current, By incrementLocator) {
+        for (int i = current; i < desired; i++) {
+            click(incrementLocator);
+        }
+    }
+
+    private int getCurrentAdults() {
+        return extractCount(ADULT_PATTERN, getPassengerInfo(), 1);
+    }
+
+    private int getCurrentChildren() {
+        return extractCount(CHILD_PATTERN, getPassengerInfo(), 0);
+    }
+
+    private int extractCount(Pattern pattern, String text, int defaultValue) {
+        Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return defaultValue;
     }
 }

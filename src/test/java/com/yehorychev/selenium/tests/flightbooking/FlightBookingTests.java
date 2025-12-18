@@ -32,7 +32,7 @@ public class FlightBookingTests extends BaseTest {
         homePage.addChildren(data.children());
         homePage.confirmPassengers();
         String passengersInfo = homePage.getPassengerInfo();
-        Assert.assertTrue(passengersInfo.contains(data.adults() + " Adult") && passengersInfo.contains(data.children() + " Child"),
+        Assert.assertTrue(passengersInfo.contains(data.adults() + " Adult,") && passengersInfo.contains(data.children() + " Child"),
                 "Unexpected passengers info: " + passengersInfo);
     }
 
