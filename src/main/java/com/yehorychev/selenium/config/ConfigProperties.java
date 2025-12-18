@@ -157,4 +157,8 @@ public class ConfigProperties {
     public static long getFullPageScrollTimeoutMillis() {
         return Long.parseLong(properties.getProperty("screenshot.fullpage.scroll.timeout.millis", "100"));
     }
+
+    public static double getFullPageDevicePixelRatio() {
+        return Double.parseDouble(properties.getProperty("screenshot.fullpage.device.pixel.ratio", "1.0"));
+    }
 }

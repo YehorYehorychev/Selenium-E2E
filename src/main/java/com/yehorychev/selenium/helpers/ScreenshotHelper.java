@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriverException;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.coordinates.WebDriverCoordsProvider;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+import ru.yandex.qatools.ashot.shooting.cutter.FixedCutStrategy;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
