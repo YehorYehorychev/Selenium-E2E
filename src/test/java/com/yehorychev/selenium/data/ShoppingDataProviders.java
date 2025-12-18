@@ -27,6 +27,23 @@ public final class ShoppingDataProviders {
                 .toArray(Object[][]::new);
     }
 
+    @DataProvider(name = "shoppingProductsFaker")
+    public static Object[][] shoppingProductsFaker() {
+        TestDataFactory.ShoppingCardDetails generated = TestDataFactory.randomShoppingCard();
+        ShoppingTestData data = new ShoppingTestData(
+                generated.productName(),
+                generated.productPrice(),
+                generated.cardNumber(),
+                generated.cvv(),
+                generated.cardHolderName(),
+                generated.expiryMonth(),
+                generated.expiryYear(),
+                generated.countryQuery(),
+                generated.countryToSelect()
+        );
+        return new Object[][]{{resolveSecrets(data)}};
+    }
+
     private static ShoppingTestData resolveSecrets(ShoppingTestData record) {
         String card = substitute(record.cardNumber(), ConfigProperties.getShoppingCardNumber());
         String cvv = substitute(record.cvv(), ConfigProperties.getShoppingCardCvv());

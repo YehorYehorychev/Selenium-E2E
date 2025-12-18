@@ -8,7 +8,6 @@ import org.openqa.selenium.WebDriverException;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.coordinates.WebDriverCoordsProvider;
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
-import ru.yandex.qatools.ashot.shooting.cutter.FixedCutStrategy;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,11 +26,11 @@ public final class ScreenshotHelper {
         // utility class
     }
 
-    public static void capture(WebDriver driver, String testName) {
-        capture(driver, testName, ConfigProperties.getScreenshotDirectory());
+    public static Path capture(WebDriver driver, String testName) {
+        return capture(driver, testName, ConfigProperties.getScreenshotDirectory());
     }
 
-    public static void capture(WebDriver driver, String testName, Path directory) {
+    public static Path capture(WebDriver driver, String testName, Path directory) {
         if (driver == null) {
             throw new IllegalArgumentException("WebDriver must not be null when capturing a screenshot");
         }
@@ -47,6 +46,7 @@ public final class ScreenshotHelper {
                     : takeViewportScreenshot(driver);
 
             ImageIO.write(image, "png", destination.toFile());
+            return destination;
         } catch (IOException e) {
             throw new RuntimeException("Failed to capture screenshot for test: " + testName, e);
         }
@@ -56,7 +56,12 @@ public final class ScreenshotHelper {
         try {
             return new AShot()
                     .coordsProvider(new WebDriverCoordsProvider())
-                    .shootingStrategy(ShootingStrategies.viewportPasting((int) ConfigProperties.getFullPageScrollTimeoutMillis()))
+                    .shootingStrategy(ShootingStrategies.viewportRetina(
+                            (int) ConfigProperties.getFullPageScrollTimeoutMillis(),
+                            0,
+                            0,
+                            (float) ConfigProperties.getFullPageDevicePixelRatio()
+                    ))
                     .takeScreenshot(driver)
                     .getImage();
         } catch (RuntimeException e) {
@@ -75,6 +80,23 @@ public final class ScreenshotHelper {
             return ImageIO.read(new ByteArrayInputStream(pngBytes));
         } catch (WebDriverException | IOException e) {
             throw new RuntimeException("Failed to capture viewport screenshot", e);
+        }
+    }
+
+    public static Path capturePageSource(WebDriver driver, String testName) {
+        if (driver == null) {
+            throw new IllegalArgumentException("WebDriver must not be null when capturing page source");
+        }
+        try {
+            Path directory = ConfigProperties.getScreenshotDirectory();
+            Files.createDirectories(directory);
+            String timestamp = LocalDateTime.now().format(FORMATTER);
+            String safeName = testName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            Path destination = directory.resolve(timestamp + "-" + safeName + ".html");
+            Files.writeString(destination, driver.getPageSource());
+            return destination;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to capture page source for test: " + testName, e);
         }
     }
 }
