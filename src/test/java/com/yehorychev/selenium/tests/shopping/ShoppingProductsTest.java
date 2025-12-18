@@ -2,6 +2,7 @@ package com.yehorychev.selenium.tests.shopping;
 
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.core.ShoppingAuthenticatedBaseTest;
+import com.yehorychev.selenium.data.ShoppingDataProviders;
 import com.yehorychev.selenium.data.ShoppingTestData;
 import com.yehorychev.selenium.pages.shopping.CartPage;
 import com.yehorychev.selenium.pages.shopping.CheckoutPage;
@@ -12,9 +13,9 @@ import org.testng.annotations.Test;
 
 public class ShoppingProductsTest extends ShoppingAuthenticatedBaseTest {
 
-    @Test
-    public void shouldAllowUserToAddProductToCartAndCheckout() {
-        ShoppingTestData testData = ShoppingTestData.defaultData(
+    @Test(dataProvider = "shoppingProducts", dataProviderClass = ShoppingDataProviders.class)
+    public void shouldAllowUserToAddProductToCartAndCheckout(ShoppingTestData dataSet) {
+        ShoppingTestData testData = dataSet.withCardDetails(
                 ConfigProperties.getShoppingCardNumber(),
                 ConfigProperties.getShoppingCardCvv()
         );

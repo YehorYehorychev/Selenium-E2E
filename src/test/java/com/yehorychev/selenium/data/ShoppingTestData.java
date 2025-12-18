@@ -23,4 +23,18 @@ public record ShoppingTestData(String productName,
                 "United States"
         );
     }
+
+    public ShoppingTestData withCardDetails(String newCardNumber, String newCvv) {
+        return new ShoppingTestData(
+                productName,
+                productPrice,
+                newCardNumber,
+                newCvv,
+                cardHolderName,
+                expiryMonth,
+                expiryYear,
+                countryQuery,
+                countryToSelect
+        );
+    }
 }
