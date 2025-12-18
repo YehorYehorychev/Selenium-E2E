@@ -13,17 +13,44 @@ public class AmazonHomePage extends BasePage {
     private static final By ACCOUNTS_AND_LISTS = By.id("nav-link-accountList");
     private static final By WATCHLIST_LINK = By.xpath("//span[normalize-space()='Watchlist']");
     private static final By SIGN_IN_HEADER = By.xpath("//h1[normalize-space()='Sign in or create account']");
-    private static final By SHOP_GIFT_CATEGORY_HEADER = By.xpath("//h2[normalize-space()='Shop gifts by category']");
+    private static final By AMAZON_CART_IS_EMPTY_HEADER = By.cssSelector(".a-size-large.a-spacing-top-base.sc-your-amazon-cart-is-empty");
     private static final By CART_ICON = By.cssSelector(".nav-cart-icon.nav-sprite");
+    private static final By INTERSTITIAL_CONTINUE_BUTTON = By.cssSelector("form[action*='storefront'] input[type='submit'], button[name='continue']");
+    private static final By INTERSTITIAL_CONTINUE_SHOPPING = By.xpath("//button[contains(.,'Continue shopping')]");
+    private static final By INTERSTITIAL_HEADER = By.xpath("//h1[contains(.,'Click the button below to continue shopping')]");
+    private static final By INTERSTITIAL_ANY_CONTINUE = By.xpath("//button[contains(.,'Continue')]");
 
     public AmazonHomePage(WebDriver driver, WaitHelper waitHelper) {
         super(driver, waitHelper);
+        dismissInterstitialIfPresent();
+    }
+
+    private void dismissInterstitialIfPresent() {
+        if (isElementPresent(INTERSTITIAL_HEADER) && isElementPresent(INTERSTITIAL_ANY_CONTINUE)) {
+            log.info("Amazon interstitial (header/button) detected, continuing");
+            click(INTERSTITIAL_ANY_CONTINUE);
+            waitForPageReady();
+            return;
+        }
+        if (isElementPresent(INTERSTITIAL_CONTINUE_BUTTON)) {
+            log.info("Amazon interstitial detected, attempting to continue shopping");
+            click(INTERSTITIAL_CONTINUE_BUTTON);
+            waitForPageReady();
+        } else if (isElementPresent(INTERSTITIAL_CONTINUE_SHOPPING)) {
+            log.info("Amazon interstitial (button) detected, attempting to continue shopping");
+            click(INTERSTITIAL_CONTINUE_SHOPPING);
+            waitForPageReady();
+        }
     }
 
     public AmazonProductResultsPage searchFor(String query) {
+        if (!isElementPresent(SEARCH_BAR)) {
+            dismissInterstitialIfPresent();
+        }
         WebElement searchBar = find(SEARCH_BAR);
-        actions().moveToElement(searchBar).click().keyDown(Keys.SHIFT).sendKeys(query).keyUp(Keys.SHIFT).perform();
-        searchBar.submit();
+        type(SEARCH_BAR, query);
+        searchBar.sendKeys(Keys.ENTER);
+        waitForPageReady();
         return new AmazonProductResultsPage(driver, waitHelper);
     }
 
@@ -41,13 +68,11 @@ public class AmazonHomePage extends BasePage {
 
     public AmazonCartPage openCartInNewWindow() {
         String parentWindow = driver.getWindowHandle();
+        if (!isElementPresent(CART_ICON)) {
+            dismissInterstitialIfPresent();
+        }
         openLinkInNewTab(CART_ICON);
         switchToNewChildWindow();
         return new AmazonCartPage(driver, waitHelper, parentWindow);
-    }
-
-    public boolean isShopGiftCategoryVisible() {
-        waitForPageReady();
-        return isVisible(SHOP_GIFT_CATEGORY_HEADER);
     }
 }

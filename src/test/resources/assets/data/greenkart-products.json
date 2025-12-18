@@ -1,0 +1,15 @@
+[
+  {
+    "vegetables": ["Brocolli", "Cauliflower", "Cucumber"],
+    "expectedCartNames": ["Brocolli - 1 Kg", "Cauliflower - 1 Kg", "Cucumber - 1 Kg"],
+    "promoCode": "rahulshettyacademy",
+    "expectSorted": true
+  },
+  {
+    "vegetables": ["Beans", "Carrot"],
+    "expectedCartNames": ["Beans - 1 Kg", "Carrot - 1 Kg"],
+    "promoCode": "rahulshettyacademy",
+    "expectSorted": true
+  }
+]
+

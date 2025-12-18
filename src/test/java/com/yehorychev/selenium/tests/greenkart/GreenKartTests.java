@@ -1,5 +1,8 @@
 package com.yehorychev.selenium.tests.greenkart;
 
+import com.yehorychev.selenium.data.GreenKartDataProviders;
+import com.yehorychev.selenium.data.GreenKartDataProviders.TopDealsData;
+import com.yehorychev.selenium.data.GreenKartTestData;
 import com.yehorychev.selenium.pages.greenkart.CartOverlay;
 import com.yehorychev.selenium.pages.greenkart.CheckoutPage;
 import com.yehorychev.selenium.pages.greenkart.GreenKartHomePage;
@@ -12,10 +15,9 @@ import java.util.List;
 
 public class GreenKartTests extends BaseTest {
 
-    private final String[] veggiesToAdd = GreenKartHomePage.defaultVegetables();
-
-    @Test
-    void addItemToCartAndApplyPromoCodeTest() {
+    @Test(dataProvider = "greenKartCartScenarios", dataProviderClass = GreenKartDataProviders.class)
+    void addItemToCartAndApplyPromoCodeTest(GreenKartTestData testData) {
+        String[] veggiesToAdd = testData.vegetables().toArray(String[]::new);
         GreenKartHomePage homePage = new GreenKartHomePage(driver(), waitHelper());
         homePage.addVegetables(veggiesToAdd);
         Assert.assertTrue(homePage.cartContainsCount(veggiesToAdd.length),
@@ -25,20 +27,19 @@ public class GreenKartTests extends BaseTest {
         CheckoutPage checkoutPage = cartOverlay.proceedToCheckout();
 
         List<String> productNames = checkoutPage.getProductNames(veggiesToAdd.length);
-        String[] expectedProductNames = {"Brocolli - 1 Kg", "Cauliflower - 1 Kg", "Cucumber - 1 Kg"};
-
-        for (String expectedProductName : expectedProductNames) {
+        for (String expectedProductName : testData.expectedCartNames()) {
             Assert.assertTrue(productNames.contains(expectedProductName),
                     "Product name not found in cart: " + expectedProductName);
         }
 
-        checkoutPage.applyPromoCode("rahulshettyacademy");
+        checkoutPage.applyPromoCode(testData.promoCode());
         Assert.assertEquals(checkoutPage.getPromoInfoText(), "Code applied ..!",
                 "Promo code was not applied successfully.");
     }
 
-    @Test
-    void verifyThatTheItemsSortedInCartTest() {
+    @Test(dataProvider = "greenKartCartSorting", dataProviderClass = GreenKartDataProviders.class)
+    void verifyThatTheItemsSortedInCartTest(GreenKartTestData testData) {
+        String[] veggiesToAdd = testData.vegetables().toArray(String[]::new);
         GreenKartHomePage homePage = new GreenKartHomePage(driver(), waitHelper());
         homePage.addVegetables(veggiesToAdd);
         Assert.assertTrue(homePage.cartContainsCount(veggiesToAdd.length),
@@ -53,12 +54,14 @@ public class GreenKartTests extends BaseTest {
                 .sorted(String::compareToIgnoreCase)
                 .toList();
 
-        Assert.assertEquals(productNames, sortedProductNames,
-                "Products in the cart are not sorted alphabetically");
+        if (testData.expectSorted()) {
+            Assert.assertEquals(productNames, sortedProductNames,
+                    "Products in the cart are not sorted alphabetically");
+        }
     }
 
-    @Test
-    void verifyDiscountPricesTest() {
+    @Test(dataProvider = "greenKartTopDeals", dataProviderClass = GreenKartDataProviders.class)
+    void verifyDiscountPricesTest(TopDealsData data) {
         GreenKartHomePage homePage = new GreenKartHomePage(driver(), waitHelper());
         TopDealsPage topDealsPage = homePage.openTopDeals();
         topDealsPage.sortNameColumn();
@@ -69,8 +72,8 @@ public class GreenKartTests extends BaseTest {
                 .toList();
         Assert.assertEquals(originalList, sortedList);
 
-        String ricePrice = topDealsPage.getPriceFor("Rice");
-        Assert.assertFalse(ricePrice.isBlank(), "Price for Rice was not found");
+        String price = topDealsPage.getPriceFor(data.priceLookup());
+        Assert.assertFalse(price.isBlank(), "Price for " + data.priceLookup() + " was not found");
 
         topDealsPage.closeAndReturn();
     }

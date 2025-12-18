@@ -1,0 +1,11 @@
+[
+  {
+    "sortedColumn": "Vegetable",
+    "priceLookup": "Rice"
+  },
+  {
+    "sortedColumn": "Price",
+    "priceLookup": "Beans"
+  }
+]
+

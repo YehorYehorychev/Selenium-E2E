@@ -1,0 +1,11 @@
+[
+  {
+    "name": "Yehor",
+    "expectedAlert": "Hello Yehor, Are you sure you want to confirm?"
+  },
+  {
+    "name": "Automation",
+    "expectedAlert": "Hello Automation, Are you sure you want to confirm?"
+  }
+]
+
