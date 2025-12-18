@@ -17,6 +17,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -59,6 +61,7 @@ public abstract class BaseTest {
             WaitHelper helper = WaitHelper.fromConfig(webDriver);
             DRIVER.set(webDriver);
             WAIT_HELPER.set(helper);
+            setTestDriverAttribute(webDriver);
 
             webDriver.navigate().to(resolveBaseUrl(baseUrlKey));
         } catch (RuntimeException e) {
@@ -146,7 +149,8 @@ public abstract class BaseTest {
                 boolean failuresOnly = ConfigProperties.captureScreenshotsOnFailuresOnly();
                 boolean shouldCapture = !failuresOnly || result.getStatus() == ITestResult.FAILURE;
                 if (shouldCapture) {
-                    ScreenshotHelper.capture(webDriver, result.getMethod().getMethodName());
+                    Path screenshotPath = ScreenshotHelper.capture(webDriver, result.getMethod().getMethodName());
+                    attachScreenshotToAllure(screenshotPath);
                 }
             }
         } catch (RuntimeException screenshotError) {
@@ -157,7 +161,23 @@ public abstract class BaseTest {
             }
             DRIVER.remove();
             WAIT_HELPER.remove();
+            result.removeAttribute("driver");
             releaseSafariLockIfHeld();
+        }
+    }
+
+    private void setTestDriverAttribute(WebDriver driver) {
+        ITestResult currentResult = org.testng.Reporter.getCurrentTestResult();
+        if (currentResult != null) {
+            currentResult.setAttribute("driver", driver);
+        }
+    }
+
+    private void attachScreenshotToAllure(Path screenshotPath) {
+        try (var input = java.nio.file.Files.newInputStream(screenshotPath)) {
+            io.qameta.allure.Allure.addAttachment(screenshotPath.getFileName().toString(), "image/png", input, "png");
+        } catch (IOException ignored) {
+            // ignore attachment failures
         }
     }
 

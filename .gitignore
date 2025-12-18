@@ -24,6 +24,7 @@ screenshots/
 videos/
 logs/
 assets/screenshots/
+.allure
 
 ### IntelliJ IDEA ###
 .idea/
