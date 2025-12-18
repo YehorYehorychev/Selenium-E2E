@@ -151,6 +151,10 @@ public abstract class BasePage {
         }
     }
 
+    protected boolean isElementPresent(By locator) {
+        return !driver.findElements(locator).isEmpty();
+    }
+
     protected void safeScrollIntoView(By locator) {
         log.debug("Scrolling element into view: {}", locator);
         waitHelper.safeScrollIntoView(locator);

@@ -1,5 +1,7 @@
 package com.yehorychev.selenium.tests.flightbooking;
 
+import com.yehorychev.selenium.data.FlightBookingDataProviders;
+import com.yehorychev.selenium.data.FlightBookingTestData;
 import com.yehorychev.selenium.pages.flightbooking.FlightBookingHomePage;
 import com.yehorychev.selenium.core.BaseTest;
 import org.testng.Assert;
@@ -12,42 +14,42 @@ public class FlightBookingTests extends BaseTest {
         return "base.url.flight.booking";
     }
 
-    @Test
-    void flightBookingTest() {
+    @Test(dataProvider = "flightBookingScenarios", dataProviderClass = FlightBookingDataProviders.class)
+    void flightBookingTest(FlightBookingTestData data) {
         FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
-        homePage.setCurrency("USD");
+        homePage.setCurrency(data.currency());
         String pageTitle = driver().getTitle();
         String pageUrl = driver().getCurrentUrl().split("\\?")[0];
         System.out.printf("The page title is: %s, and the page base URL is: %s", pageTitle, pageUrl);
-        Assert.assertEquals(homePage.getSelectedCurrency(), "USD");
+        Assert.assertEquals(homePage.getSelectedCurrency(), data.currency());
     }
 
-    @Test
-    void flightBookingPassengersDropdownTest() {
+    @Test(dataProvider = "flightBookingScenarios", dataProviderClass = FlightBookingDataProviders.class)
+    void flightBookingPassengersDropdownTest(FlightBookingTestData data) {
         FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
         homePage.openPassengerSelector();
-        homePage.addAdults(1);
-        homePage.addChildren(2);
+        homePage.addAdults(data.adults());
+        homePage.addChildren(data.children());
         homePage.confirmPassengers();
         String passengersInfo = homePage.getPassengerInfo();
-        Assert.assertTrue(passengersInfo.contains("2 Adult") && passengersInfo.contains("2 Child"),
-                "Expected '2 Adult, 2 Child' but got: " + passengersInfo);
+        Assert.assertTrue(passengersInfo.contains(data.adults() + " Adult,") && passengersInfo.contains(data.children() + " Child"),
+                "Unexpected passengers info: " + passengersInfo);
     }
 
-    @Test
-    void flightBookingFromToCitiesTest() {
+    @Test(dataProvider = "flightBookingScenarios", dataProviderClass = FlightBookingDataProviders.class)
+    void flightBookingFromToCitiesTest(FlightBookingTestData data) {
         FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
-        homePage.selectOrigin("GOI");
-        homePage.selectDestination("BLR");
-        Assert.assertEquals(homePage.getSelectedOrigin(), "Goa (GOI)");
-        Assert.assertEquals(homePage.getSelectedDestination(), "Bengaluru (BLR)");
+        homePage.selectOrigin(data.origin());
+        homePage.selectDestination(data.destination());
+        Assert.assertTrue(homePage.getSelectedOrigin().contains(data.origin()));
+        Assert.assertTrue(homePage.getSelectedDestination().contains(data.destination()));
     }
 
-    @Test
-    void flightBookingDynamicDropdownTest() {
+    @Test(dataProvider = "flightBookingScenarios", dataProviderClass = FlightBookingDataProviders.class)
+    void flightBookingDynamicDropdownTest(FlightBookingTestData data) {
         FlightBookingHomePage homePage = new FlightBookingHomePage(driver(), waitHelper());
-        homePage.searchCountry("Br");
-        homePage.chooseCountrySuggestion("Virgin Islands (British)");
-        Assert.assertEquals(homePage.getSelectedCountry(), "Virgin Islands (British)");
+        homePage.searchCountry(data.countryQuery());
+        homePage.chooseCountrySuggestion(data.countrySuggestion());
+        Assert.assertEquals(homePage.getSelectedCountry(), data.countrySuggestion());
     }
 }

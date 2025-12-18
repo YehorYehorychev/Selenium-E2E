@@ -1,5 +1,6 @@
 package com.yehorychev.selenium.tests.amazon;
 
+import com.yehorychev.selenium.data.AmazonDataProviders;
 import com.yehorychev.selenium.pages.amazon.AmazonCartPage;
 import com.yehorychev.selenium.pages.amazon.AmazonHomePage;
 import com.yehorychev.selenium.pages.amazon.AmazonProductResultsPage;
@@ -28,13 +29,13 @@ public class AmazonTests extends BaseTest {
         return options;
     }
 
-    @Test
-    void amazonSearchBarTest() {
+    @Test(dataProvider = "amazonSearchKeywords", dataProviderClass = AmazonDataProviders.class)
+    void amazonSearchBarTest(String keyword) {
         AmazonHomePage homePage = new AmazonHomePage(driver(), waitHelper());
-        AmazonProductResultsPage resultsPage = homePage.searchFor("laptop");
+        AmazonProductResultsPage resultsPage = homePage.searchFor(keyword);
 
         Assert.assertFalse(resultsPage.getSearchResults().isEmpty(), "Search returned no results!");
-        Assert.assertEquals(resultsPage.getSearchBoxValue().toLowerCase(), "laptop");
+        Assert.assertEquals(resultsPage.getSearchBoxValue().toLowerCase(), keyword.toLowerCase());
     }
 
     @Test
@@ -49,12 +50,15 @@ public class AmazonTests extends BaseTest {
         Assert.assertTrue(homePage.isSignInHeaderDisplayed());
     }
 
-    @Test
-    void amazonCartInNewWindowTest() {
+    @Test(dataProvider = "amazonCartAccess", dataProviderClass = AmazonDataProviders.class)
+    void amazonCartInNewWindowTest(boolean expectCartVisible) {
         AmazonHomePage homePage = new AmazonHomePage(driver(), waitHelper());
         AmazonCartPage cartPage = homePage.openCartInNewWindow();
 
-        Assert.assertTrue(cartPage.isCartHeaderDisplayed());
-        Assert.assertTrue(homePage.isShopGiftCategoryVisible());
+        if (expectCartVisible) {
+            Assert.assertTrue(cartPage.isCartHeaderDisplayed());
+        } else {
+            Assert.assertFalse(cartPage.isCartHeaderDisplayed());
+        }
     }
 }

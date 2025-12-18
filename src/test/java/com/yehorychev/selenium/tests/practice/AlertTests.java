@@ -1,6 +1,8 @@
 package com.yehorychev.selenium.tests.practice;
 
 import com.yehorychev.selenium.core.BaseTest;
+import com.yehorychev.selenium.data.PracticeDataProviders;
+import com.yehorychev.selenium.data.PracticeDataProviders.PracticeAlertData;
 import com.yehorychev.selenium.pages.practice.PracticeAlertsPage;
 import com.yehorychev.selenium.pages.practice.PracticeFooterSection;
 import com.yehorychev.selenium.pages.practice.PracticeTableSection;
@@ -21,14 +23,14 @@ public class AlertTests extends BaseTest {
         return "base.url.practice.page";
     }
 
-    @Test
-    void dismissAlertTest() {
+    @Test(dataProvider = "practiceAlerts", dataProviderClass = PracticeDataProviders.class)
+    void dismissAlertTest(PracticeAlertData data) {
         PracticeAlertsPage alertsPage = new PracticeAlertsPage(driver(), waitHelper());
-        alertsPage.enterName("Yehor");
+        alertsPage.enterName(data.name());
         alertsPage.triggerConfirmAlert();
 
         String alertText = alertsPage.readAlertText();
-        Assert.assertEquals(alertText, "Hello Yehor, Are you sure you want to confirm?");
+        Assert.assertEquals(alertText, data.expectedAlert());
 
         alertsPage.dismissAlert();
         alertsPage.waitForAlertDismissed();

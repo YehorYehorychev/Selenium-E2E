@@ -1,0 +1,21 @@
+[
+  {
+    "currency": "USD",
+    "adults": 1,
+    "children": 2,
+    "origin": "GOI",
+    "destination": "BLR",
+    "countryQuery": "Br",
+    "countrySuggestion": "Virgin Islands (British)"
+  },
+  {
+    "currency": "INR",
+    "adults": 2,
+    "children": 1,
+    "origin": "DEL",
+    "destination": "HYD",
+    "countryQuery": "Ind",
+    "countrySuggestion": "India"
+  }
+]
+
