@@ -1,9 +1,10 @@
 package com.yehorychev.selenium.tests.shopping;
 
-import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.core.ShoppingAuthenticatedBaseTest;
 import com.yehorychev.selenium.data.ShoppingDataProviders;
 import com.yehorychev.selenium.data.ShoppingTestData;
+import com.yehorychev.selenium.data.TestDataFactory;
+import com.yehorychev.selenium.data.TestDataFactory.ShoppingCardDetails;
 import com.yehorychev.selenium.pages.shopping.CartPage;
 import com.yehorychev.selenium.pages.shopping.CheckoutPage;
 import com.yehorychev.selenium.pages.shopping.DashboardPage;
@@ -23,7 +24,7 @@ public class ShoppingProductsTest extends ShoppingAuthenticatedBaseTest {
     @Description("End-to-end purchase flow that adds a product to cart and completes checkout")
     public void shouldAllowUserToAddProductToCartAndCheckout(ShoppingTestData dataSet) {
         annotateDataSet(String.format("Dataset: %s (%s)", dataSet.productName(), dataSet.productPrice()), SeverityLevel.CRITICAL);
-        ShoppingTestData testData = enrichWithSecrets(dataSet);
+        ShoppingTestData testData = dataSet;
 
         DashboardPage dashboardPage = openDashboard();
         verifyDashboardLoaded(dashboardPage);
@@ -40,12 +41,6 @@ public class ShoppingProductsTest extends ShoppingAuthenticatedBaseTest {
         verifyOrderConfirmation(confirmationPage, testData);
     }
 
-    private ShoppingTestData enrichWithSecrets(ShoppingTestData dataSet) {
-        return dataSet.withCardDetails(
-                ConfigProperties.getShoppingCardNumber(),
-                ConfigProperties.getShoppingCardCvv()
-        );
-    }
 
     @Step("Verify dashboard page is loaded")
     private void verifyDashboardLoaded(DashboardPage dashboardPage) {
@@ -75,19 +70,23 @@ public class ShoppingProductsTest extends ShoppingAuthenticatedBaseTest {
 
     @Step("Fill checkout form and place order")
     private void fillCheckoutForm(CheckoutPage checkoutPage, ShoppingTestData testData) {
+        TestDataFactory.UserProfile customerProfile = TestDataFactory.randomUser();
+        String customerFullName = "%s %s".formatted(customerProfile.firstName(), customerProfile.lastName());
+        ShoppingCardDetails paymentDetails = TestDataFactory.randomShoppingCard();
         Allure.step("Fill checkout form and place order", () -> {
             Assert.assertTrue(checkoutPage.isLoaded(), "Checkout page should be visible");
             Assert.assertEquals(checkoutPage.getProductName(), testData.productName());
             Assert.assertEquals(checkoutPage.getProductPrice(), testData.productPrice());
 
             checkoutPage
-                    .enterCreditCardNumber(testData.cardNumber())
-                    .enterCvv(testData.cvv())
-                    .enterName(testData.cardHolderName())
-                    .selectExpiryMonth(testData.expiryMonth())
-                    .selectExpiryYear(testData.expiryYear())
+                    .enterCreditCardNumber(paymentDetails.cardNumber())
+                    .enterCvv(paymentDetails.cvv())
+                    .enterName(customerFullName)
+                    .selectExpiryMonth(paymentDetails.expiryMonth())
+                    .selectExpiryYear(paymentDetails.expiryYear())
                     .selectCountry(testData.countryQuery(), testData.countryToSelect())
                     .placeOrder();
+            Allure.addAttachment("Checkout customer", customerFullName);
         });
     }
 

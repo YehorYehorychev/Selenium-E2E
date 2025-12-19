@@ -43,9 +43,8 @@ public final class TestDataFactory {
                 "$" + FAKER.number().numberBetween(50, 15000),
                 FAKER.finance().creditCard(),
                 FAKER.number().digits(3),
-                randomFullName(),
-                String.valueOf(FAKER.number().numberBetween(1, 12)),
-                String.valueOf(FAKER.number().numberBetween(26, 35)),
+                "12",
+                "29",
                 "United",
                 "United States"
         );
@@ -69,7 +68,6 @@ public final class TestDataFactory {
                                       String productPrice,
                                       String cardNumber,
                                       String cvv,
-                                      String cardHolderName,
                                       String expiryMonth,
                                       String expiryYear,
                                       String countryQuery,

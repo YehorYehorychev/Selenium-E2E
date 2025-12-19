@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,8 @@ public final class JsonDataHelper {
         return readResource(resourcePath, new TypeReference<>() {});
     }
 
-    private static InputStream getResourceAsStream(String resourcePath) throws IOException {
+    @SneakyThrows
+    private static InputStream getResourceAsStream(String resourcePath) {
         InputStream inputStream = JsonDataHelper.class.getClassLoader().getResourceAsStream(resourcePath);
         if (inputStream == null) {
             throw new IOException("Resource not found: " + resourcePath);
@@ -102,4 +104,3 @@ public final class JsonDataHelper {
         return inputStream;
     }
 }
-
