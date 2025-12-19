@@ -9,6 +9,9 @@ Modular UI/API automation framework built with Java 25, Maven, and TestNG. It ex
 - AShot-backed `ScreenshotHelper` capturing full-page PNGs on demand or failures only (configurable).
 - REST-assured utilities for Shopping-site authentication plus data-driven records/JSON fixtures.
 - Allure wiring with automatic screenshot attachments in `target/allure-results`.
+- Faker-powered `TestDataFactory` generating realistic user/payment data per test run while static product/country data lives in JSON fixtures.
+- Lombok annotations (`@SneakyThrows`, records) keep helpers concise without sacrificing readability.
+- All tests instrumented with Allure steps/severity metadata for CI-friendly reporting.
 
 ## Prerequisites
 - JDK 25+
@@ -41,6 +44,11 @@ All runtime settings live in `src/test/resources/config.properties`:
 - `browser.default`, `wait.*`, `screenshot.*`, shopping credentials.
 - Any property can be overridden via JVM arguments (e.g., `-Dbrowser=firefox`).
 
+### Test Data & Data Providers
+- Static business data (e.g., shopping product name/price/country) resides in `src/test/resources/assets/data/*.json` and is loaded through TestNG data providers (`ShoppingDataProviders`, etc.).
+- Dynamic/sensitive values (names, cards, CVV, expiry) come from `TestDataFactory` (Faker) right inside the tests, so fixtures stay environment-agnostic.
+- Additional providers can be added per module under `src/test/java/com/yehorychev/selenium/data` to keep test classes lean.
+
 ## Running Tests
 Execute the full TestNG suite:
 ```bash
@@ -67,6 +75,9 @@ mvn allure:report
 ```
 Publish the folder `target/site/allure-maven-plugin` or archive `target/allure-results` for remote viewers.
 
+### Step Instrumentation
+Every test method wraps user actions/assertions in `@Step`-annotated helpers (or `Allure.step` blocks). This guarantees readable timelines in the Allure UI and complements the automatic screenshot/page-source attachments from `BaseTest`.
+
 ## Screenshots
 - Destination folder: `screenshot.directory`.
 - `screenshot.failures.only` and `screenshot.fullpage.*` toggle capture frequency and AShot strategy.
@@ -75,6 +86,7 @@ Publish the folder `target/site/allure-maven-plugin` or archive `target/allure-r
 ## Test Data
 - Shopping module leverages `ShoppingTestData` records + TestNG data providers.
 - JSON fixtures under `src/test/resources` can be expanded for other modules.
+- Faker-backed helpers sit in `TestDataFactory`; reuse them whenever random-yet-realistic data is preferable to static fixtures (e.g., registration flows).
 
 ## Parallelism & Safari Notes
 - Suite runs with `parallel="methods"` and `thread-count="6"`.
