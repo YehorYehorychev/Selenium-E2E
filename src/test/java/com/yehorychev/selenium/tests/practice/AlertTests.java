@@ -6,17 +6,13 @@ import com.yehorychev.selenium.data.PracticeDataProviders.PracticeAlertData;
 import com.yehorychev.selenium.pages.practice.PracticeAlertsPage;
 import com.yehorychev.selenium.pages.practice.PracticeFooterSection;
 import com.yehorychev.selenium.pages.practice.PracticeTableSection;
-import io.qameta.allure.Allure;
-import io.qameta.allure.Description;
-import io.qameta.allure.Severity;
-import io.qameta.allure.SeverityLevel;
-import io.qameta.allure.Step;
+import io.qameta.allure.*;
+import lombok.SneakyThrows;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -54,7 +50,7 @@ public class AlertTests extends BaseTest {
     @Test
     @Severity(SeverityLevel.CRITICAL)
     @Description("Check footer links for broken responses")
-    void brokenLinksTest() throws IOException {
+    void brokenLinksTest() {
         PracticeFooterSection footerSection = openFooterSection();
         validateLinks(footerSection);
     }
@@ -124,7 +120,8 @@ public class AlertTests extends BaseTest {
     }
 
     @Step("Validate footer links")
-    private void validateLinks(PracticeFooterSection footerSection) throws IOException {
+    @SneakyThrows
+    private void validateLinks(PracticeFooterSection footerSection) {
         Allure.step("Validate footer links", () -> {
             SoftAssert softAssert = new SoftAssert();
             List<WebElement> links = footerSection.getFooterLinks();
@@ -144,6 +141,7 @@ public class AlertTests extends BaseTest {
     }
 
     @Step("Fetch status code for URL")
+    @lombok.SneakyThrows
     private int fetchStatusCode(String href) {
         return Allure.step("Fetch status code", () -> {
             HttpURLConnection connection = (HttpURLConnection) new URL(href).openConnection();
