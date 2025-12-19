@@ -2,13 +2,7 @@
   {
     "productName": "ZARA COAT 3",
     "productPrice": "$ 11500",
-    "cardNumber": "${shopping.card.number}",
-    "cvv": "${shopping.card.cvv}",
-    "cardHolderName": "Yehor Test",
-    "expiryMonth": "12",
-    "expiryYear": "29",
     "countryQuery": "United",
     "countryToSelect": "United States"
   }
 ]
-

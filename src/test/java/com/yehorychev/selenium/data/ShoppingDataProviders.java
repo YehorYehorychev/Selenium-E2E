@@ -1,7 +1,6 @@
 package com.yehorychev.selenium.data;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.helpers.JsonDataHelper;
 import org.testng.annotations.DataProvider;
 
@@ -22,7 +21,6 @@ public final class ShoppingDataProviders {
         );
 
         return records.stream()
-                .map(ShoppingDataProviders::resolveSecrets)
                 .map(record -> new Object[]{record})
                 .toArray(Object[][]::new);
     }
@@ -33,29 +31,9 @@ public final class ShoppingDataProviders {
         ShoppingTestData data = new ShoppingTestData(
                 generated.productName(),
                 generated.productPrice(),
-                generated.cardNumber(),
-                generated.cvv(),
-                generated.cardHolderName(),
-                generated.expiryMonth(),
-                generated.expiryYear(),
                 generated.countryQuery(),
                 generated.countryToSelect()
         );
-        return new Object[][]{{resolveSecrets(data)}};
-    }
-
-    private static ShoppingTestData resolveSecrets(ShoppingTestData record) {
-        String card = substitute(record.cardNumber(), ConfigProperties.getShoppingCardNumber());
-        String cvv = substitute(record.cvv(), ConfigProperties.getShoppingCardCvv());
-        return record.withCardDetails(card, cvv);
-    }
-
-    private static String substitute(String value, String fallback) {
-        if (value == null || value.isBlank()) {
-            return fallback;
-        }
-        return value
-                .replace("${shopping.card.number}", ConfigProperties.getShoppingCardNumber())
-                .replace("${shopping.card.cvv}", ConfigProperties.getShoppingCardCvv());
+        return new Object[][]{{data}};
     }
 }

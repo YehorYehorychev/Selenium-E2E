@@ -141,7 +141,7 @@ public class AlertTests extends BaseTest {
     }
 
     @Step("Fetch status code for URL")
-    @lombok.SneakyThrows
+    @SneakyThrows
     private int fetchStatusCode(String href) {
         return Allure.step("Fetch status code", () -> {
             HttpURLConnection connection = (HttpURLConnection) new URL(href).openConnection();
