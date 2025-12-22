@@ -1,23 +1,15 @@
 # Selenium Framework 2026
 
 ## Overview
-Modular UI/API automation framework built with Java 25, Maven, and TestNG. It exercises Page Object Model, data-driven testing, and hybrid UI/API flows across several sample applications (GreenKart, Shopping, Amazon, Flight Booking, etc.). The stack shares a common `BaseTest`, extensible Page Objects, reusable helpers (waits, screenshots, API), and Allure reporting.
+Resilient UI/API automation framework built with Java 25, Maven, and TestNG. It drives Page Object Model coverage for multiple sample applications (GreenKart, Shopping, Amazon, Flight Booking, Practice Page, etc.) while reusing a common `BaseTest`, rich Page Objects, helper utilities (waits, screenshots, API clients, JSON readers), and Allure reporting hooks.
 
-## Key Features
-- Full Page Object Model split by business domains/pages.
-- Centralized `BaseTest` with resilient `WaitHelper`, WebDriverManager integration, browser selection (Chrome/Firefox/Safari), and thread-safe driver lifecycle management.
-- AShot-backed `ScreenshotHelper` capturing full-page PNGs on demand or failures only (configurable).
-- REST-assured utilities for Shopping-site authentication plus data-driven records/JSON fixtures.
-- Allure wiring with automatic screenshot attachments in `target/allure-results`.
-- Faker-powered `TestDataFactory` generating realistic user/payment data per test run while static product/country data lives in JSON fixtures.
-- Lombok annotations (`@SneakyThrows`, records) keep helpers concise without sacrificing readability.
-- All tests instrumented with Allure steps/severity metadata for CI-friendly reporting.
-
-## Prerequisites
-- JDK 25+
-- Maven 3.9+
-- Local Chrome/Firefox/Safari (WebDriverManager downloads binaries automatically)
-- Allure CLI for viewing reports: [installation guide](https://docs.qameta.io/allure/#_installing_a_commandline)
+## Tech Stack
+- Selenium 4.38.0 (WebDriver, DevTools, waits) orchestrated via WebDriverManager 5.9.2 for automatic binary provisioning.
+- TestNG 7.11.0 as the primary runner (suite control, data providers, listeners, parallelism).
+- SLF4J logging, Allure TestNG adapter 2.27.0, AShot 1.5.4 for full-page screenshots.
+- Jackson 2.18.x, custom `JsonDataHelper`, and REST-assured 5.5.6 for API-driven flows (e.g., shopping authentication token).
+- Faker (DataFaker 2.3.1) + Lombok (records, `@SneakyThrows`) for concise, randomized test data factories.
+- Maven Surefire 3.2.5 + Allure Maven plugin for CLI/CI integration.
 
 ## Project Layout
 ```
@@ -26,73 +18,88 @@ src
 ├─ main
 │  └─ java/com/yehorychev/selenium
 │     ├─ config/ConfigProperties.java
-│     ├─ helpers/{WaitHelper,ScreenshotHelper,...}
-│     └─ pages/{greenKart,shopping,amazon,...}
+│     ├─ helpers/{WaitHelper,ScreenshotHelper,JsonDataHelper,WaitTimeoutException}
+│     └─ pages
+│        ├─ amazon/
+│        ├─ flightbooking/
+│        ├─ greenkart/
+│        ├─ practice/
+│        ├─ shopping/
+│        └─ common/{BasePage,components}
 └─ test
    ├─ java/com/yehorychev/selenium
    │  ├─ core/BaseTest.java
    │  ├─ listeners/AllureTestListener.java
-   │  └─ tests/{greenKart,shopping,amazon,...}
+   │  └─ tests
+   │     ├─ amazon/
+   │     ├─ flightbooking/
+   │     ├─ greenkart/
+   │     ├─ practice/
+   │     └─ shopping/
+   │        ├─ api/ (Rest-Assured clients, DTOs)
+   │        ├─ data/ (TestNG data providers, fixtures)
+   │        └─ ui/ (TestNG UI test classes)
    └─ resources
+      ├─ assets/
+      │  ├─ data/*.json
+      │  └─ screenshots/
       ├─ config.properties
       └─ testng.xml
 ```
 
 ## Configuration
-All runtime settings live in `src/test/resources/config.properties`:
-- `base.url.*` – base URLs per site.
-- `browser.default`, `wait.*`, `screenshot.*`, shopping credentials.
-- Any property can be overridden via JVM arguments (e.g., `-Dbrowser=firefox`).
+`src/test/resources/config.properties` centralizes runtime knobs:
+- `base.url.*` entries per application (shopping, amazon, practice, etc.).
+- Browser profile: `browser.default`, `browser.headless.enabled`, extra args (`browser.headless.args`) consumed when Chrome/Firefox headless is required (CI or Jenkins agents).
+- Wait behavior: `wait.default.seconds`, `wait.polling.millis` feed `WaitHelper` defaults (override per action when needed).
+- Screenshots: destination folder, failures-only toggle, and AShot scrolling timeout.
+- Shopping credentials/card defaults for API authentication or payment flows. Sensitive data can be overridden with JVM flags/environment variables, e.g. `mvn test -Dshopping.password=***`.
 
-### Test Data & Data Providers
-- Static business data (e.g., shopping product name/price/country) resides in `src/test/resources/assets/data/*.json` and is loaded through TestNG data providers (`ShoppingDataProviders`, etc.).
-- Dynamic/sensitive values (names, cards, CVV, expiry) come from `TestDataFactory` (Faker) right inside the tests, so fixtures stay environment-agnostic.
-- Additional providers can be added per module under `src/test/java/com/yehorychev/selenium/data` to keep test classes lean.
+Any property is overrideable at runtime: `mvn test -Dbrowser=firefox -Dbase.url.shopping=https://...`.
+
+## Test Data & Fixtures
+- **Static fixtures** live under `src/test/resources/assets/data/*.json` (products, passengers, alert texts, etc.) and load through `JsonDataHelper` or dedicated TestNG data providers in `tests/**/data` packages.
+- **Dynamic data** (customer profile, cards, emails) comes from `TestDataFactory` (Faker-backed) so tests stay idempotent while covering real-world inputs.
+- Shopping API utilities (REST-assured clients) reuse both fixture data and Faker output to bootstrap UI tests with tokens/cookies when necessary.
 
 ## Running Tests
-Execute the full TestNG suite:
+Full suite:
 ```bash
 mvn clean test
 ```
-- Override browser through CLI (`-Dbrowser=safari`) or via `<parameter>` in `testng.xml`.
-- To target specific tests: `mvn clean test -Dtest=ShoppingProductsTest` or run from IDE.
+Common overrides:
+- Target a specific module: `mvn clean test -Dtest=ShoppingProductsTest` (class) or from IDE.
+- Switch browser: `mvn clean test -Dbrowser=firefox` (Chrome, Firefox, Safari supported; Safari guarded by locking due to driver limitations).
+- Force headless: `mvn clean test -Dbrowser.headless.enabled=true` (adds `browser.headless.args` to driver options).
+- Point to different base site: `mvn clean test -DbaseUrlKey=base.url.practice.page` (read by `BaseTest`).
+- Adjust waits/screenshots inline (e.g., `-Dwait.default.seconds=10`).
 
-### TestNG Parameters
-Suite parameters accept `baseUrlKey`/`browser`. To start tests on another site:
-```bash
-mvn clean test -DbaseUrlKey=base.url.shopping
-```
+Parallelism is configured in `testng.xml` (methods-level by default). Increase/decrease `thread-count` depending on infrastructure capacity.
+
+## Screenshots & Diagnostics
+- `ScreenshotHelper` (AShot) captures full-page PNGs either for every test or failures only based on configuration; outputs stored under `screenshot.directory` and auto-attached to Allure.
+- `WaitHelper` centralizes visibility/clickability waits, page-ready/AJAX checks, scroll + retry actions, and wraps timeout exceptions in `WaitTimeoutException` with descriptive logs.
+- Custom logging (SLF4J) surrounds high-level actions, easing triage when combined with Allure attachments and TestNG reports.
 
 ## Allure Reporting
-After `mvn test`, artifacts reside in `target/allure-results`.
-- Launch local server:
+Artifacts: `target/allure-results`.
+- Start interactive viewer:
 ```bash
 mvn allure:serve
 ```
-- Generate static report for CI:
+- Produce static report (for CI publishing):
 ```bash
 mvn allure:report
 ```
-Publish the folder `target/site/allure-maven-plugin` or archive `target/allure-results` for remote viewers.
+Attach the generated `target/site/allure-maven-plugin` or raw results to CI artifacts. Steps and assertions leverage Allure steps (via annotations or `Allure.step(...)`) ensuring readable timelines with embedded screenshots/page source when failures occur.
 
-### Step Instrumentation
-Every test method wraps user actions/assertions in `@Step`-annotated helpers (or `Allure.step` blocks). This guarantees readable timelines in the Allure UI and complements the automatic screenshot/page-source attachments from `BaseTest`.
-
-## Screenshots
-- Destination folder: `screenshot.directory`.
-- `screenshot.failures.only` and `screenshot.fullpage.*` toggle capture frequency and AShot strategy.
-- Each capture is attached to the related Allure test entry automatically.
-
-## Test Data
-- Shopping module leverages `ShoppingTestData` records + TestNG data providers.
-- JSON fixtures under `src/test/resources` can be expanded for other modules.
-- Faker-backed helpers sit in `TestDataFactory`; reuse them whenever random-yet-realistic data is preferable to static fixtures (e.g., registration flows).
-
-## Parallelism & Safari Notes
-- Suite runs with `parallel="methods"` and `thread-count="6"`.
-- Safari WebDriver is guarded by a `ReentrantLock`, so it runs sequentially (driver limitation). Consider dedicated suites or lower thread count when Safari is required.
+## CI & Headless Guidance
+- Jenkins/agents without GUI should use headless mode (`browser.headless.enabled=true`) + GPU disabling flags already present in `config.properties`.
+- Browser choice is parameterized; pass `-Dbrowser=<chrome|firefox|safari>` per pipeline/environment.
+- Ensure Allure CLI or allure Docker image is available for publishing reports from CI logs.
+- Retain `target/screenshots` and `target/allure-results` as build artifacts for debugging when pipelines fail.
 
 ## Troubleshooting
-- **Amazon tests**: interstitials/geo prompts may appear; `AmazonHomePage` tries to dismiss them, but additional waits or VPN may be needed.
-- **Broken links test**: external Udemy link can return 4xx; whitelist or mock if constant failures are undesirable.
-- **CDP warning (Chrome 143)**: Selenium 4.38 ships DevTools v142; warning disappears once Selenium adds CDP143 support.
+- **Amazon storefront** may show location modals; corresponding Page Objects dismiss them, but extra waits might be necessary for geo-specific deployments.
+- **Safari parallel issues**: WebDriver limitations prevent concurrent sessions; fallback to sequential or dedicate Safari-only suite.
+- **CDP mismatch warnings** appear until Selenium ships matching DevTools version for the installed Chrome build; safe to ignore unless debugging DevTools APIs.
