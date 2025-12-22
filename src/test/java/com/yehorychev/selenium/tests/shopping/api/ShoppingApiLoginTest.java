@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.tests.shopping;
+package com.yehorychev.selenium.tests.shopping.api;
 
 import com.yehorychev.selenium.config.ConfigProperties;
 import io.restassured.http.ContentType;

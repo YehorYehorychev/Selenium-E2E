@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.data;
+package com.yehorychev.selenium.tests.amazon.data;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yehorychev.selenium.helpers.JsonDataHelper;

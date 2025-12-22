@@ -1,7 +1,7 @@
-package com.yehorychev.selenium.tests.flightbooking;
+package com.yehorychev.selenium.tests.flightbooking.ui;
 
-import com.yehorychev.selenium.data.FlightBookingDataProviders;
-import com.yehorychev.selenium.data.FlightBookingTestData;
+import com.yehorychev.selenium.tests.flightbooking.data.FlightBookingDataProviders;
+import com.yehorychev.selenium.tests.flightbooking.data.FlightBookingTestData;
 import com.yehorychev.selenium.pages.flightbooking.FlightBookingHomePage;
 import com.yehorychev.selenium.core.BaseTest;
 import io.qameta.allure.Allure;

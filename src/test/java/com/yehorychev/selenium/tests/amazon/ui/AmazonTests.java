@@ -1,6 +1,6 @@
-package com.yehorychev.selenium.tests.amazon;
+package com.yehorychev.selenium.tests.amazon.ui;
 
-import com.yehorychev.selenium.data.AmazonDataProviders;
+import com.yehorychev.selenium.tests.amazon.data.AmazonDataProviders;
 import com.yehorychev.selenium.pages.amazon.AmazonCartPage;
 import com.yehorychev.selenium.pages.amazon.AmazonHomePage;
 import com.yehorychev.selenium.pages.amazon.AmazonProductResultsPage;

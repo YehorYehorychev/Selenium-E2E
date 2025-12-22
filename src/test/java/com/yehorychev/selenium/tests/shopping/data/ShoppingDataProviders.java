@@ -1,7 +1,8 @@
-package com.yehorychev.selenium.data;
+package com.yehorychev.selenium.tests.shopping.data;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yehorychev.selenium.helpers.JsonDataHelper;
+import com.yehorychev.selenium.tests.shared.data.TestDataFactory;
 import org.testng.annotations.DataProvider;
 
 import java.util.List;

@@ -7,13 +7,14 @@
     <parameter name="browser" value="chrome"/>
     <test name="All_UI_AND_API_Tests">
         <classes>
-            <class name="com.yehorychev.selenium.tests.greenkart.GreenKartTests"/>
-            <class name="com.yehorychev.selenium.tests.amazon.AmazonTests"/>
-            <class name="com.yehorychev.selenium.tests.flightbooking.FlightBookingTests"/>
-            <class name="com.yehorychev.selenium.tests.practice.AlertTests"/>
-            <class name="com.yehorychev.selenium.tests.shopping.ShoppingLoginTest"/>
-            <class name="com.yehorychev.selenium.tests.shopping.ShoppingApiLoginTest"/>
-            <class name="com.yehorychev.selenium.tests.shopping.ShoppingProductsTest"/>
+            <class name="com.yehorychev.selenium.tests.greenkart.ui.GreenKartTests"/>
+            <class name="com.yehorychev.selenium.tests.amazon.ui.AmazonTests"/>
+            <class name="com.yehorychev.selenium.tests.flightbooking.ui.FlightBookingTests"/>
+            <class name="com.yehorychev.selenium.tests.practice.ui.AlertTests"/>
+            <class name="com.yehorychev.selenium.tests.shopping.ui.ShoppingLoginTest"/>
+            <class name="com.yehorychev.selenium.tests.shopping.api.ShoppingApiLoginTest"/>
+            <class name="com.yehorychev.selenium.tests.shopping.ui.ShoppingProductsTest"/>
+            <class name="com.yehorychev.selenium.tests.shopping.ui.ShoppingDashboardApiUiTest"/>
         </classes>
     </test>
 </suite>

@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.api;
+package com.yehorychev.selenium.tests.shopping.api.helpers;
 
 /**
  * Immutable representation of an authenticated shopping session retrieved via API.
@@ -13,4 +13,3 @@ public record ShoppingSession(String token, String userId, String userEmail, Str
         }
     }
 }
-

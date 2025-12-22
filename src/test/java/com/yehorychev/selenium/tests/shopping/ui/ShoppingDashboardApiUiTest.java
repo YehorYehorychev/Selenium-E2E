@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.tests.shopping;
+package com.yehorychev.selenium.tests.shopping.ui;
 
 import com.yehorychev.selenium.core.ShoppingAuthenticatedBaseTest;
 import com.yehorychev.selenium.pages.shopping.DashboardPage;

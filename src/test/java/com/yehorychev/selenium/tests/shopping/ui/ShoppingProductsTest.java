@@ -1,10 +1,10 @@
-package com.yehorychev.selenium.tests.shopping;
+package com.yehorychev.selenium.tests.shopping.ui;
 
 import com.yehorychev.selenium.core.ShoppingAuthenticatedBaseTest;
-import com.yehorychev.selenium.data.ShoppingDataProviders;
-import com.yehorychev.selenium.data.ShoppingTestData;
-import com.yehorychev.selenium.data.TestDataFactory;
-import com.yehorychev.selenium.data.TestDataFactory.ShoppingCardDetails;
+import com.yehorychev.selenium.tests.shopping.data.ShoppingDataProviders;
+import com.yehorychev.selenium.tests.shopping.data.ShoppingTestData;
+import com.yehorychev.selenium.tests.shared.data.TestDataFactory;
+import com.yehorychev.selenium.tests.shared.data.TestDataFactory.ShoppingCardDetails;
 import com.yehorychev.selenium.pages.shopping.CartPage;
 import com.yehorychev.selenium.pages.shopping.CheckoutPage;
 import com.yehorychev.selenium.pages.shopping.DashboardPage;

@@ -1,8 +1,8 @@
-package com.yehorychev.selenium.tests.practice;
+package com.yehorychev.selenium.tests.practice.ui;
 
 import com.yehorychev.selenium.core.BaseTest;
-import com.yehorychev.selenium.data.PracticeDataProviders;
-import com.yehorychev.selenium.data.PracticeDataProviders.PracticeAlertData;
+import com.yehorychev.selenium.tests.practice.data.PracticeDataProviders;
+import com.yehorychev.selenium.tests.practice.data.PracticeDataProviders.PracticeAlertData;
 import com.yehorychev.selenium.pages.practice.PracticeAlertsPage;
 import com.yehorychev.selenium.pages.practice.PracticeFooterSection;
 import com.yehorychev.selenium.pages.practice.PracticeTableSection;

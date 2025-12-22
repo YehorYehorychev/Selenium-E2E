@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.data;
+package com.yehorychev.selenium.tests.shared.data;
 
 import net.datafaker.Faker;
 

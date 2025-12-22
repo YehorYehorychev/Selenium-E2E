@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.data;
+package com.yehorychev.selenium.tests.flightbooking.data;
 
 public record FlightBookingTestData(String currency,
                                     int adults,
@@ -8,4 +8,3 @@ public record FlightBookingTestData(String currency,
                                     String countryQuery,
                                     String countrySuggestion) {
 }
-
