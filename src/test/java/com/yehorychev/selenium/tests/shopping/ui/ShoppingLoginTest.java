@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.tests.shopping;
+package com.yehorychev.selenium.tests.shopping.ui;
 
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.core.BaseTest;

@@ -1,8 +1,8 @@
-package com.yehorychev.selenium.tests.greenkart;
+package com.yehorychev.selenium.tests.greenkart.ui;
 
-import com.yehorychev.selenium.data.GreenKartDataProviders;
-import com.yehorychev.selenium.data.GreenKartDataProviders.TopDealsData;
-import com.yehorychev.selenium.data.GreenKartTestData;
+import com.yehorychev.selenium.tests.greenkart.data.GreenKartDataProviders;
+import com.yehorychev.selenium.tests.greenkart.data.GreenKartDataProviders.TopDealsData;
+import com.yehorychev.selenium.tests.greenkart.data.GreenKartTestData;
 import com.yehorychev.selenium.pages.greenkart.CartOverlay;
 import com.yehorychev.selenium.pages.greenkart.CheckoutPage;
 import com.yehorychev.selenium.pages.greenkart.GreenKartHomePage;

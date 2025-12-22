@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.data;
+package com.yehorychev.selenium.tests.practice.data;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.yehorychev.selenium.helpers.JsonDataHelper;
@@ -25,4 +25,3 @@ public final class PracticeDataProviders {
     public record PracticeAlertData(String name, String expectedAlert) {
     }
 }
-

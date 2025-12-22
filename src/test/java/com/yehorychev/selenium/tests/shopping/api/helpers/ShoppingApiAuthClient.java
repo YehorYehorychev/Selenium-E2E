@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.api;
+package com.yehorychev.selenium.tests.shopping.api.helpers;
 
 import com.yehorychev.selenium.config.ConfigProperties;
 import io.restassured.http.ContentType;
@@ -45,4 +45,3 @@ public class ShoppingApiAuthClient {
         return new ShoppingSession(token, userId, email, message);
     }
 }
-

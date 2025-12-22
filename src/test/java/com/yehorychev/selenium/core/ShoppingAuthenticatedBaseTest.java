@@ -1,7 +1,7 @@
 package com.yehorychev.selenium.core;
 
-import com.yehorychev.selenium.api.ShoppingApiAuthClient;
-import com.yehorychev.selenium.api.ShoppingSession;
+import com.yehorychev.selenium.tests.shopping.api.helpers.ShoppingApiAuthClient;
+import com.yehorychev.selenium.tests.shopping.api.helpers.ShoppingSession;
 import com.yehorychev.selenium.pages.shopping.DashboardPage;
 import org.openqa.selenium.JavascriptExecutor;
 import org.testng.annotations.BeforeClass;
