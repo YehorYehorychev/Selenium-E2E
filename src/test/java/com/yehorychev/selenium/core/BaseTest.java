@@ -129,12 +129,18 @@ public abstract class BaseTest {
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
         options.setExperimentalOption("useAutomationExtension", false);
+        if (ConfigProperties.isHeadlessEnabled()) {
+            ConfigProperties.getHeadlessArguments().forEach(options::addArguments);
+        }
         return options;
     }
 
     protected FirefoxOptions buildFirefoxOptions() {
         FirefoxOptions options = new FirefoxOptions();
         options.addArguments("-private");
+        if (ConfigProperties.isHeadlessEnabled()) {
+            options.addArguments("-headless");
+        }
         return options;
     }
 

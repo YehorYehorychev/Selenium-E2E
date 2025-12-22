@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Configuration class to manage test properties such as base URLs.
@@ -126,6 +129,27 @@ public class ConfigProperties {
 
     public static Duration getDefaultWaitPollingInterval() {
         return Duration.ofMillis(Long.parseLong(getProperty("wait.polling.millis")));
+    }
+
+    public static boolean isHeadlessEnabled() {
+        String override = System.getProperty("browser.headless",
+                System.getenv().getOrDefault("BROWSER_HEADLESS", ""));
+        if (override != null && !override.isBlank()) {
+            return Boolean.parseBoolean(override.trim());
+        }
+        return Boolean.parseBoolean(properties.getProperty("browser.headless.enabled", "false"));
+    }
+
+    public static List<String> getHeadlessArguments() {
+        String override = System.getProperty("browser.headless.args",
+                System.getenv().getOrDefault("BROWSER_HEADLESS_ARGS", ""));
+        String raw = (override != null && !override.isBlank())
+                ? override
+                : properties.getProperty("browser.headless.args", "--headless=new;--disable-gpu");
+        return Arrays.stream(raw.split(";"))
+                .map(String::trim)
+                .filter(entry -> !entry.isEmpty())
+                .collect(Collectors.toList());
     }
 
     /**
