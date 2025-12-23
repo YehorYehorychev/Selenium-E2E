@@ -42,12 +42,12 @@ After installation, Jenkins will be available at: `http://localhost:8080`
 2. Find the **JDK** section
 3. Click "Add JDK"
 4. Fill in:
-   - **Name**: `JDK17` (must match Jenkinsfile)
+   - **Name**: `JDK25` (must match Jenkinsfile)
    - **JAVA_HOME**: path to your JDK
      ```bash
      # For macOS, find the path with:
-     /usr/libexec/java_home -v 17
-     # Example: /Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home
+     /usr/libexec/java_home -v 25
+     # Example: /Library/Java/JavaVirtualMachines/jdk-25.jdk/Contents/Home
      ```
    - Uncheck "Install automatically" if using existing JDK
 
@@ -149,7 +149,7 @@ sudo apt install firefox
 
 You can create a `Dockerfile`:
 ```dockerfile
-FROM maven:3.9-eclipse-temurin-17
+FROM maven:3.9-eclipse-temurin-25
 
 # Install Chrome
 RUN apt-get update && apt-get install -y \
@@ -176,7 +176,7 @@ WORKDIR /app
 1. Open your Job: `Selenium-Framework-Tests`
 2. Click **Build with Parameters**
 3. Select parameters:
-   - **BROWSER**: chrome / firefox / edge
+   - **BROWSER**: chrome / firefox / safari
    - **TEST_SUITE**: all / shopping / greenkart / amazon / flightbooking / practice
    - **HEADLESS**: true / false
 4. Click **Build**

@@ -3,13 +3,13 @@ pipeline {
 
     tools {
         maven 'Maven3'
-        jdk 'JDK17'
+        jdk 'JDK25'
     }
 
     parameters {
         choice(
             name: 'BROWSER',
-            choices: ['chrome', 'firefox', 'edge'],
+            choices: ['chrome', 'firefox', 'safari'],
             description: 'Browser to run tests on'
         )
         choice(
