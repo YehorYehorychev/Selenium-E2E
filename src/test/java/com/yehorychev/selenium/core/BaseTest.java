@@ -13,6 +13,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
@@ -21,12 +23,15 @@ import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class BaseTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(BaseTest.class);
 
     // Thread-local storage for WebDriver and WaitHelper instances,
     // ensuring thread safety during parallel test execution.
@@ -90,6 +95,14 @@ public abstract class BaseTest {
     }
 
     private WebDriver createWebDriver(BrowserType browserType) {
+        String remoteUrl = System.getProperty("selenium.grid.url", System.getenv("SELENIUM_GRID_URL"));
+        boolean useRemote = remoteUrl != null && !remoteUrl.isBlank();
+
+        if (useRemote) {
+            logger.info("Using Remote WebDriver at: {}", remoteUrl);
+            return createRemoteWebDriver(remoteUrl, browserType);
+        }
+
         return switch (browserType) {
             case FIREFOX -> {
                 WebDriverManager.firefoxdriver().setup();
@@ -101,6 +114,19 @@ public abstract class BaseTest {
                 yield new ChromeDriver(buildChromeOptions());
             }
         };
+    }
+
+    private WebDriver createRemoteWebDriver(String remoteUrl, BrowserType browserType) {
+        try {
+            java.net.URL url = URI.create(remoteUrl).toURL();
+            return switch (browserType) {
+                case CHROME -> new org.openqa.selenium.remote.RemoteWebDriver(url, buildChromeOptions());
+                case FIREFOX -> new org.openqa.selenium.remote.RemoteWebDriver(url, buildFirefoxOptions());
+                case SAFARI -> throw new IllegalStateException("Safari not supported in Remote/Grid mode");
+            };
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid Selenium Grid URL: " + remoteUrl, e);
+        }
     }
 
     private static String firstNonBlank(String... values) {
@@ -129,8 +155,19 @@ public abstract class BaseTest {
         options.addArguments("--disable-blink-features=AutomationControlled");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
         options.setExperimentalOption("useAutomationExtension", false);
-        if (ConfigProperties.isHeadlessEnabled()) {
-            ConfigProperties.getHeadlessArguments().forEach(options::addArguments);
+
+        // CI/Docker environment detection and forced headless
+        boolean isCI = System.getenv("CI") != null || System.getenv("JENKINS_HOME") != null;
+        if (ConfigProperties.isHeadlessEnabled() || isCI) {
+            options.addArguments("--headless=new");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--disable-extensions");
+            options.addArguments("--proxy-server='direct://'");
+            options.addArguments("--proxy-bypass-list=*");
+            options.addArguments("--start-maximized");
         }
         return options;
     }
@@ -138,8 +175,12 @@ public abstract class BaseTest {
     protected FirefoxOptions buildFirefoxOptions() {
         FirefoxOptions options = new FirefoxOptions();
         options.addArguments("-private");
-        if (ConfigProperties.isHeadlessEnabled()) {
+
+        boolean isCI = System.getenv("CI") != null || System.getenv("JENKINS_HOME") != null;
+        if (ConfigProperties.isHeadlessEnabled() || isCI) {
             options.addArguments("-headless");
+            options.addArguments("--width=1920");
+            options.addArguments("--height=1080");
         }
         return options;
     }

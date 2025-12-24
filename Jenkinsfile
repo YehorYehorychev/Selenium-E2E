@@ -26,6 +26,7 @@ pipeline {
 
     environment {
         MAVEN_OPTS = '-Xmx2048m -XX:MaxMetaspaceSize=512m'
+        SELENIUM_GRID_URL = getSeleniumGridUrl("${params.BROWSER}")
     }
 
     stages {
@@ -60,6 +61,7 @@ pipeline {
                         mvn test \
                         -Dbrowser=${params.BROWSER} \
                         -Dheadless=${params.HEADLESS} \
+                        -Dselenium.grid.url=${env.SELENIUM_GRID_URL} \
                         -DsuiteXmlFile=${suiteFile} \
                         -Dallure.results.directory=target/allure-results
                     """
@@ -127,3 +129,14 @@ def getSuiteFile(suite) {
     }
 }
 
+def getSeleniumGridUrl(browser) {
+    def gridHost = env.SELENIUM_GRID_HOST ?: 'localhost'
+    switch(browser?.toLowerCase()) {
+        case 'chrome':
+            return "http://${gridHost}:4444/wd/hub"
+        case 'firefox':
+            return "http://${gridHost}:4445/wd/hub"
+        default:
+            return "http://${gridHost}:4444/wd/hub"
+    }
+}
