@@ -57,29 +57,16 @@ pipeline {
                     def suiteFile = getSuiteFile(params.TEST_SUITE)
                     echo "Running ${params.TEST_SUITE} tests in ${params.BROWSER} browser (headless: ${params.HEADLESS})"
 
-                    sh """
-                        mvn test \
-                        -Dbrowser=${params.BROWSER} \
-                        -Dheadless=${params.HEADLESS} \
-                        -Dselenium.grid.url=${env.SELENIUM_GRID_URL} \
-                        -DsuiteXmlFile=${suiteFile} \
-                        -Dallure.results.directory=target/allure-results
-                    """
-                }
-            }
-        }
-
-        stage('Generate Allure Report') {
-            steps {
-                script {
-                    echo "Generating Allure report..."
-                    allure([
-                        includeProperties: false,
-                        jdk: '',
-                        properties: [],
-                        reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'target/allure-results']]
-                    ])
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        sh """
+                            mvn test \
+                            -Dbrowser=${params.BROWSER} \
+                            -Dheadless=${params.HEADLESS} \
+                            -Dselenium.grid.url=${env.SELENIUM_GRID_URL} \
+                            -DsuiteXmlFile=${suiteFile} \
+                            -Dallure.results.directory=target/allure-results
+                        """
+                    }
                 }
             }
         }
@@ -88,6 +75,17 @@ pipeline {
     post {
         always {
             echo "Archiving test results and screenshots..."
+
+            script {
+                echo "Generating Allure report..."
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'target/allure-results']]
+                ])
+            }
 
             archiveArtifacts artifacts: 'target/screenshots/**/*.png', allowEmptyArchive: true
 
