@@ -67,3 +67,12 @@ replay_pid*
 ### Selenium specific ###
 webdriver/
 drivers/
+
+### Docker ###
+jenkins_home/
+.docker/
+docker-compose.override.yml
+
+### Jenkins ###
+.jenkins/
+jenkins-data/

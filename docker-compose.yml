@@ -1,0 +1,51 @@
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-jdk21
+    container_name: jenkins-selenium
+    platform: linux/amd64
+    privileged: true
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - selenium-grid
+
+  chrome:
+    image: seleniarm/standalone-chromium:latest
+    container_name: selenium-chrome
+    platform: linux/arm64
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    environment:
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_SESSION_TIMEOUT=300
+    networks:
+      - selenium-grid
+
+  firefox:
+    image: seleniarm/standalone-firefox:latest
+    container_name: selenium-firefox
+    platform: linux/arm64
+    shm_size: 2gb
+    ports:
+      - "4445:4444"
+      - "7901:7900"
+    environment:
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_SESSION_TIMEOUT=300
+    networks:
+      - selenium-grid
+
+volumes:
+  jenkins_home:
+
+networks:
+  selenium-grid:
+    driver: bridge
+
