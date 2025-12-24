@@ -130,13 +130,13 @@ def getSuiteFile(suite) {
 }
 
 def getSeleniumGridUrl(browser) {
-    def gridHost = env.SELENIUM_GRID_HOST ?: 'localhost'
+    def gridHost = env.SELENIUM_GRID_HOST ?: 'selenium-chrome'
     switch(browser?.toLowerCase()) {
         case 'chrome':
-            return "http://${gridHost}:4444/wd/hub"
+            return "http://selenium-chrome:4444/wd/hub"
         case 'firefox':
-            return "http://${gridHost}:4445/wd/hub"
+            return "http://selenium-firefox:4444/wd/hub"
         default:
-            return "http://${gridHost}:4444/wd/hub"
+            return "http://selenium-chrome:4444/wd/hub"
     }
 }
