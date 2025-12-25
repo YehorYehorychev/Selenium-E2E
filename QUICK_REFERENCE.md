@@ -53,6 +53,10 @@ docker compose down
 # Start
 docker compose up -d
 
+# Rebuild Jenkins image (if Dockerfile changed)
+docker compose build --no-cache jenkins
+docker compose up -d
+
 # Get password
 docker exec jenkins-selenium cat /var/jenkins_home/secrets/initialAdminPassword
 
@@ -100,10 +104,14 @@ After build completes, look for **"Allure Report"** button in left sidebar (NOT 
 **If button is missing:**
 1. Install "Allure Jenkins Plugin" (Manage Jenkins → Plugins)
 2. Configure Allure commandline tool (Manage Jenkins → Tools)
-   - Name MUST be exactly: `Allure`
-   - Choose "Install automatically"
-3. Re-run the job
-4. Button appears after first successful report generation
+   - **Name MUST be exactly:** `Allure`
+   - **Option A (Recommended):** Use pre-installed (from Dockerfile.jenkins)
+     - Installation directory: `/opt/allure-2.27.0`
+     - Uncheck "Install automatically"
+   - **Option B:** Choose "Install automatically" + select version `2.27.0`
+3. Rebuild Jenkins if using Dockerfile: `docker compose build jenkins && docker compose up -d`
+4. Re-run the job
+5. Button appears after first successful report generation
 
 **Verify report data:**
 - Check archived artifacts contain `target/allure-results/*.json` files

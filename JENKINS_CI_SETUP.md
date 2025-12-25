@@ -114,7 +114,41 @@ Or navigate to: http://localhost:8080
 5. Click "Install"
 6. Wait and restart if prompted
 
-### 8. Create Pipeline Job
+### 8. Configure Allure Commandline Tool
+
+**Important:** The Allure plugin requires the Allure commandline tool to generate reports.
+
+#### Option A: Use Pre-installed Allure (Recommended)
+
+The custom `Dockerfile.jenkins` includes Allure 2.27.0 pre-installed.
+
+1. `Manage Jenkins` → `Tools`
+2. Scroll to **Allure Commandline installations**
+3. Click "Add Allure Commandline"
+4. Configure:
+   - **Name:** `Allure` ⚠️ (must match exactly - used in Jenkinsfile)
+   - **Installation directory:** `/opt/allure-2.27.0`
+   - **Uncheck** "Install automatically" (already in Docker image)
+5. Click "Save"
+
+#### Option B: Auto-Install (Alternative)
+
+If you're NOT using the custom Dockerfile:
+
+1. `Manage Jenkins` → `Tools`
+2. Scroll to **Allure Commandline installations**
+3. Click "Add Allure Commandline"
+4. Configure:
+   - **Name:** `Allure` ⚠️ (must match exactly)
+   - **Check** "Install automatically"
+   - **Version:** Select `2.27.0` or latest from dropdown
+5. Click "Save"
+
+**Verification:**
+- After next build, "Allure Report" button should appear in build sidebar
+- Check build logs for: `Generating Allure report...`
+
+### 9. Create Pipeline Job
 
 1. Main page → "New Item"
 2. Name: `Selenium_E2E`
@@ -167,7 +201,7 @@ Scroll to **Pipeline** section:
 
 Click "Save"
 
-### 9. Run First Build
+### 10. Run First Build
 
 1. Click "Build with Parameters"
 2. Select:
@@ -176,7 +210,7 @@ Click "Save"
    - HEADLESS: `true`
 3. Click "Build"
 
-### 10. Monitor Execution
+### 11. Monitor Execution
 
 **Console Output:**
 - Click on build #1

@@ -137,21 +137,37 @@ When tests run in Jenkins:
    - Install and restart Jenkins
 
 2. **Configure Allure commandline tool:**
+   
+   **Option A: Use Pre-installed Allure (Recommended)**
+   - The custom `Dockerfile.jenkins` includes Allure 2.27.0 pre-installed
    - Navigate to: Manage Jenkins → Tools
    - Scroll to "Allure Commandline installations"
    - Click "Add Allure Commandline"
-   - Name it exactly `Allure` (this matches the Jenkinsfile reference)
-   - Choose "Install automatically" or specify the path if installed manually
+   - Name: `Allure` (must match exactly - used in Jenkinsfile)
+   - Installation directory: `/opt/allure-2.27.0`
+   - **Uncheck** "Install automatically" (already in Docker image)
+   - Save configuration
+
+   **Option B: Let Jenkins Auto-Install**
+   - Navigate to: Manage Jenkins → Tools
+   - Scroll to "Allure Commandline installations"
+   - Click "Add Allure Commandline"
+   - Name: `Allure` (must match exactly)
+   - **Check** "Install automatically"
+   - Choose version: `2.27.0` or latest
    - Save configuration
 
 3. **Verify report generation:**
+   - Rebuild the Docker image: `docker compose build jenkins`
+   - Restart services: `docker compose up -d`
    - Check build logs for "Generating Allure report..." message
    - Verify `target/allure-results/` contains `.json` files (look in archived artifacts)
-   - Re-run the pipeline after plugin/tool installation
    - The button should appear after the first successful report generation
 
 4. **Common issues:**
-   - **"ERROR: Allure commandline 'Allure' doesn't exist"**: The tool name in Jenkins Tools must match exactly `Allure`
+   - **"ERROR: Allure commandline 'Allure' doesn't exist"**: 
+     - The tool name in Jenkins Tools must match exactly `Allure`
+     - Or rebuild Docker image with: `docker compose build --no-cache jenkins`
    - **Button still missing**: Try running the job twice - sometimes the button appears after the second build
    - **Empty report**: Check that tests actually ran and produced allure-results (look for JSON files in artifacts)
 
