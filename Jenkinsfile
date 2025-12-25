@@ -81,14 +81,20 @@ pipeline {
                 allure([
                     includeProperties: false,
                     jdk: '',
+                    commandline: 'Allure',
                     properties: [],
                     reportBuildPolicy: 'ALWAYS',
                     results: [[path: 'target/allure-results']]
                 ])
             }
 
-            archiveArtifacts artifacts: 'target/screenshots/**/*.png', allowEmptyArchive: true
+            // Archive screenshots from actual location
+            archiveArtifacts artifacts: 'src/test/resources/assets/screenshots/**/*.png', allowEmptyArchive: true
 
+            // Archive surefire reports
+            archiveArtifacts artifacts: 'target/surefire-reports/**/*.xml', allowEmptyArchive: true
+
+            // Publish JUnit test results
             junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
 
             // cleanWs()
