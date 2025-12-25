@@ -86,16 +86,62 @@ Parallelism is configured in `testng.xml` (methods-level by default). Increase/d
 - Custom logging (SLF4J) surrounds high-level actions, easing triage when combined with Allure attachments and TestNG reports.
 
 ## Allure Reporting
-Artifacts: `target/allure-results`.
-- Start interactive viewer:
+
+### Understanding Allure Reports
+Allure consists of two components:
+1. **Raw data** (`target/allure-results/`) - JSON files with test execution data, screenshots, logs
+2. **HTML report** - Interactive web dashboard generated from the raw data
+
+### Local Report Generation
+**Option 1: Interactive viewer** (auto-refreshes browser):
 ```bash
 mvn allure:serve
 ```
-- Produce static report (for CI publishing):
+
+**Option 2: Static HTML report** (for sharing):
 ```bash
 mvn allure:report
+# Report available at: target/site/allure-maven-plugin/index.html
 ```
-Attach the generated `target/site/allure-maven-plugin` or raw results to CI artifacts. Steps and assertions leverage Allure steps (via annotations or `Allure.step(...)`) ensuring readable timelines with embedded screenshots/page source when failures occur.
+
+You can also use Allure CLI directly:
+```bash
+# Install Allure CLI (one-time setup)
+brew install allure  # macOS
+# or download from https://github.com/allure-framework/allure2/releases
+
+# Generate and open report
+allure serve target/allure-results
+```
+
+### Jenkins Integration
+When tests run in Jenkins:
+1. Tests execute and populate `target/allure-results/` with JSON artifacts
+2. Jenkins Allure plugin automatically:
+   - Generates HTML report from the raw data
+   - Publishes it to Jenkins workspace
+   - Adds **"Allure Report"** button on build page sidebar
+3. Click the button to view interactive dashboard with:
+   - Test execution trends (passed/failed/broken over time)
+   - Test suites and categories
+   - Full-page screenshots attached to failed tests
+   - Step-by-step execution timeline
+   - Browser logs and page source
+   - Severity and feature tags
+
+**Important:** The "Allure Report" button appears in the left sidebar of the build page, NOT in the main artifacts section. If you don't see it:
+- Ensure Allure Jenkins plugin is installed (Manage Jenkins → Plugins → Allure)
+- Check build logs for "Generating Allure report..." message
+- Verify `target/allure-results/` contains `.json` files
+- Re-run the pipeline after plugin installation
+
+### What Gets Attached to Reports
+Steps and assertions leverage Allure annotations (`@Step`, `@Severity`, `@Description`) and `Allure.step(...)` blocks ensuring readable timelines with:
+- Full-page screenshots (via AShot) on failures
+- Page source HTML for DOM inspection
+- Browser console logs
+- API request/response payloads
+- Custom attachments (JSON data, test parameters)
 
 ## CI & Headless Guidance
 

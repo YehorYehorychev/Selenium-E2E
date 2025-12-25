@@ -76,18 +76,6 @@ pipeline {
         always {
             echo "Archiving test results and screenshots..."
 
-            script {
-                echo "Generating Allure report..."
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    commandline: 'Allure',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'target/allure-results']]
-                ])
-            }
-
             // Archive screenshots from actual location
             archiveArtifacts artifacts: 'src/test/resources/assets/screenshots/**/*.png', allowEmptyArchive: true
 
@@ -96,6 +84,17 @@ pipeline {
 
             // Publish JUnit test results
             junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+
+            // Generate Allure Report
+            script {
+                echo "Generating Allure report..."
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'target/allure-results']],
+                    reportBuildPolicy: 'ALWAYS'
+                ])
+            }
 
             // cleanWs()
         }
