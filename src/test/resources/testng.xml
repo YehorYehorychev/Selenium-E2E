@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="SeleniumFrameworkSuite" parallel="true" thread-count="6">
+<suite name="SeleniumFrameworkSuite" parallel="methods" thread-count="6">
     <listeners>
         <listener class-name="com.yehorychev.selenium.listeners.AllureTestListener"/>
     </listeners>

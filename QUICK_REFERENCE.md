@@ -10,13 +10,17 @@ mvn clean test
 mvn test -Dbrowser=firefox
 
 # Specific suite
-mvn test -DsuiteXmlFile=testng-shopping.xml
+mvn test -DsuiteXmlFile=src/test/resources/testng-shopping.xml
+mvn test -DsuiteXmlFile=src/test/resources/testng-amazon.xml
+mvn test -DsuiteXmlFile=src/test/resources/testng-greenkart.xml
+mvn test -DsuiteXmlFile=src/test/resources/testng-flightbooking.xml
+mvn test -DsuiteXmlFile=src/test/resources/testng-practice.xml
 
 # Headless mode
 mvn test -Dheadless=true
 
 # Combined
-mvn test -Dbrowser=chrome -DsuiteXmlFile=testng-shopping.xml -Dheadless=true
+mvn test -Dbrowser=chrome -DsuiteXmlFile=src/test/resources/testng-shopping.xml -Dheadless=true
 ```
 
 ---
@@ -59,10 +63,28 @@ open http://localhost:8080
 docker compose down
 ```
 
+### Running Specific Test Suites in Jenkins
+
+When creating/running a Jenkins job:
+
+1. **Click "Build with Parameters"** (not just "Build")
+2. **Select TEST_SUITE parameter:**
+   - `all` - Runs all tests (testng.xml)
+   - `shopping` - Runs only shopping tests (testng-shopping.xml)
+   - `amazon` - Runs only Amazon tests (testng-amazon.xml)
+   - `greenkart` - Runs only GreenKart tests (testng-greenkart.xml)
+   - `flightbooking` - Runs only flight booking tests (testng-flightbooking.xml)
+   - `practice` - Runs only practice page tests (testng-practice.xml)
+3. **Select BROWSER parameter:** chrome, firefox, safari
+4. **Select HEADLESS parameter:** true/false
+
+**Note:** If you click "Build" instead of "Build with Parameters", Jenkins will use default values (all tests, chrome, headless=true).
+
 ---
 
 ## Allure Reports
 
+### Local
 ```bash
 # Interactive viewer
 mvn allure:serve
@@ -71,6 +93,21 @@ mvn allure:serve
 mvn allure:report
 # Report: target/site/allure-maven-plugin/index.html
 ```
+
+### Jenkins
+After build completes, look for **"Allure Report"** button in left sidebar (NOT in artifacts).
+
+**If button is missing:**
+1. Install "Allure Jenkins Plugin" (Manage Jenkins → Plugins)
+2. Configure Allure commandline tool (Manage Jenkins → Tools)
+   - Name MUST be exactly: `Allure`
+   - Choose "Install automatically"
+3. Re-run the job
+4. Button appears after first successful report generation
+
+**Verify report data:**
+- Check archived artifacts contain `target/allure-results/*.json` files
+- Look for "Generating Allure report..." in build logs
 
 ---
 

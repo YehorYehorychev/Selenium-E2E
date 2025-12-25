@@ -55,11 +55,21 @@ pipeline {
             steps {
                 script {
                     def suiteFile = getSuiteFile(params.TEST_SUITE)
-                    echo "Running ${params.TEST_SUITE} tests in ${params.BROWSER} browser (headless: ${params.HEADLESS})"
+                    echo "=========================================="
+                    echo "Test Execution Configuration:"
+                    echo "  Suite: ${params.TEST_SUITE}"
+                    echo "  Browser: ${params.BROWSER}"
+                    echo "  Headless: ${params.HEADLESS}"
+                    echo "  Grid URL: ${env.SELENIUM_GRID_URL}"
+                    echo "  Suite File: ${suiteFile}"
+                    echo "=========================================="
+
+                    // Verify suite file exists
+                    sh "test -f ${suiteFile} && echo 'Suite file found' || echo 'WARNING: Suite file not found!'"
 
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                         sh """
-                            mvn test \
+                            mvn clean test \
                             -Dbrowser=${params.BROWSER} \
                             -Dheadless=${params.HEADLESS} \
                             -Dselenium.grid.url=${env.SELENIUM_GRID_URL} \
@@ -91,6 +101,7 @@ pipeline {
                 allure([
                     includeProperties: false,
                     jdk: '',
+                    commandline: 'Allure',
                     results: [[path: 'target/allure-results']],
                     reportBuildPolicy: 'ALWAYS'
                 ])
