@@ -1,9 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Shopping Test Suite" parallel="tests" thread-count="2">
-    <test name="Shopping Tests">
-        <packages>
-            <package name="com.yehorychev.selenium.tests.shopping.*"/>
-        </packages>
+<suite name="Shopping Test Suite" parallel="methods" thread-count="3">
+    <listeners>
+        <listener class-name="com.yehorychev.selenium.listeners.AllureTestListener"/>
+    </listeners>
+    <test name="Shopping UI Tests">
+        <classes>
+            <class name="com.yehorychev.selenium.tests.shopping.ui.ShoppingLoginTest"/>
+            <class name="com.yehorychev.selenium.tests.shopping.ui.ShoppingProductsTest"/>
+            <class name="com.yehorychev.selenium.tests.shopping.ui.ShoppingDashboardApiUiTest"/>
+        </classes>
+    </test>
+    <test name="Shopping API Tests">
+        <classes>
+            <class name="com.yehorychev.selenium.tests.shopping.api.ShoppingApiLoginTest"/>
+        </classes>
     </test>
 </suite>

@@ -130,10 +130,30 @@ When tests run in Jenkins:
    - Severity and feature tags
 
 **Important:** The "Allure Report" button appears in the left sidebar of the build page, NOT in the main artifacts section. If you don't see it:
-- Ensure Allure Jenkins plugin is installed (Manage Jenkins → Plugins → Allure)
-- Check build logs for "Generating Allure report..." message
-- Verify `target/allure-results/` contains `.json` files
-- Re-run the pipeline after plugin installation
+
+1. **Ensure Allure Jenkins plugin is installed:**
+   - Navigate to: Manage Jenkins → Plugins → Available plugins
+   - Search for "Allure Jenkins Plugin"
+   - Install and restart Jenkins
+
+2. **Configure Allure commandline tool:**
+   - Navigate to: Manage Jenkins → Tools
+   - Scroll to "Allure Commandline installations"
+   - Click "Add Allure Commandline"
+   - Name it exactly `Allure` (this matches the Jenkinsfile reference)
+   - Choose "Install automatically" or specify the path if installed manually
+   - Save configuration
+
+3. **Verify report generation:**
+   - Check build logs for "Generating Allure report..." message
+   - Verify `target/allure-results/` contains `.json` files (look in archived artifacts)
+   - Re-run the pipeline after plugin/tool installation
+   - The button should appear after the first successful report generation
+
+4. **Common issues:**
+   - **"ERROR: Allure commandline 'Allure' doesn't exist"**: The tool name in Jenkins Tools must match exactly `Allure`
+   - **Button still missing**: Try running the job twice - sometimes the button appears after the second build
+   - **Empty report**: Check that tests actually ran and produced allure-results (look for JSON files in artifacts)
 
 ### What Gets Attached to Reports
 Steps and assertions leverage Allure annotations (`@Step`, `@Severity`, `@Description`) and `Allure.step(...)` blocks ensuring readable timelines with:
