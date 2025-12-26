@@ -102,11 +102,9 @@ pipeline {
             script {
                 echo "Generating Allure report..."
 
-                // Check if allure results exist
                 sh 'ls -la target/allure-results/ || echo "No allure-results found"'
                 sh 'find target/allure-results -type f | head -10 || echo "No files in allure-results"'
 
-                // Generate report using system Allure CLI
                 sh '''
                     if [ -d "target/allure-results" ] && [ "$(ls -A target/allure-results)" ]; then
                         echo "Generating Allure HTML report..."
@@ -121,7 +119,16 @@ pipeline {
             // Archive Allure HTML report
             archiveArtifacts artifacts: 'target/allure-report/**/*', allowEmptyArchive: true
 
-            // Publish Allure Report via plugin (if configured)
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/allure-report',
+                reportFiles: 'index.html',
+                reportName: 'Allure Report',
+                reportTitles: 'Allure Test Report'
+            ])
+
             script {
                 try {
                     allure([
@@ -131,8 +138,8 @@ pipeline {
                         reportBuildPolicy: 'ALWAYS'
                     ])
                 } catch (Exception e) {
-                    echo "⚠️ Allure plugin not configured, using shell-generated report instead"
-                    echo "View report in artifacts: target/allure-report/index.html"
+                    echo "⚠️ Allure plugin not configured, using HTML Publisher instead"
+                    echo "View report: Click 'Allure Report' link in build sidebar"
                 }
             }
 
