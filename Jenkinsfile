@@ -106,13 +106,34 @@ pipeline {
                 sh 'ls -la target/allure-results/ || echo "No allure-results found"'
                 sh 'find target/allure-results -type f | head -10 || echo "No files in allure-results"'
 
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    commandline: 'Allure',
-                    results: [[path: 'target/allure-results']],
-                    reportBuildPolicy: 'ALWAYS'
-                ])
+                // Generate report using system Allure CLI
+                sh '''
+                    if [ -d "target/allure-results" ] && [ "$(ls -A target/allure-results)" ]; then
+                        echo "Generating Allure HTML report..."
+                        allure generate target/allure-results -o target/allure-report --clean
+                        echo "✅ Allure report generated at target/allure-report/index.html"
+                    else
+                        echo "⚠️ No Allure results found, skipping report generation"
+                    fi
+                '''
+            }
+
+            // Archive Allure HTML report
+            archiveArtifacts artifacts: 'target/allure-report/**/*', allowEmptyArchive: true
+
+            // Publish Allure Report via plugin (if configured)
+            script {
+                try {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        results: [[path: 'target/allure-results']],
+                        reportBuildPolicy: 'ALWAYS'
+                    ])
+                } catch (Exception e) {
+                    echo "⚠️ Allure plugin not configured, using shell-generated report instead"
+                    echo "View report in artifacts: target/allure-report/index.html"
+                }
             }
 
             // cleanWs()
