@@ -32,7 +32,7 @@ open http://localhost:8080
 ```bash
 cd /Users/yehor/IdeaProjects/selenium-framework
 
-# For Apple Silicon (M1/M2/M3)
+# Start Jenkins + Selenium Grid containers
 docker compose up -d
 
 # Wait 30-60 seconds for initialization
@@ -44,10 +44,10 @@ docker compose up -d
 docker ps
 ```
 
-Should show 2-3 containers:
-- `jenkins-selenium` (port 8080)
-- `selenium-chrome` (port 4444)
-- `selenium-firefox` (port 4445, may not start on ARM64)
+Should show 3 containers:
+- `jenkins-selenium` (port 8080) - CI/CD server
+- `selenium-chrome` (port 4444) - Chrome Grid
+- `selenium-firefox` (port 4445) - Firefox Grid
 
 ### 3. Get Initial Password
 
@@ -330,7 +330,6 @@ Jenkins runs tests → Grid provides browsers → Tests execute in isolated cont
 ---
 
 For more details:
-- [APPLE_SILICON_SETUP.md](APPLE_SILICON_SETUP.md) - Mac-specific setup
 - [QUICK_REFERENCE.md](QUICK_REFERENCE.md) - Command cheat sheet
 - [README.md](README.md) - Framework documentation
 

@@ -16,8 +16,8 @@ Resilient UI/API automation framework built with Java 21+, Maven, and TestNG. It
 ```
 pom.xml
 Jenkinsfile
-docker-compose.yml          (STANDALONE Grid for Apple Silicon)
-docker-compose-hub.yml      (Hub+Nodes alternative for Intel)
+docker-compose.yml          (Jenkins + Selenium Grid standalone containers)
+Dockerfile.jenkins          (Custom Jenkins image with Java 21, Maven, Allure)
 src
 ├─ main
 │  └─ java/com/yehorychev/selenium
@@ -35,10 +35,10 @@ src
    │  ├─ core/BaseTest.java
    │  ├─ listeners/AllureTestListener.java
    │  └─ tests
-   │     ├─ amazon/
-   │     ├─ flightbooking/
-   │     ├─ greenkart/
-   │     ├─ practice/
+   │     ├─ amazon/ui/
+   │     ├─ flightbooking/ui/
+   │     ├─ greenkart/ui/
+   │     ├─ practice/ui/
    │     └─ shopping/
    │        ├─ api/ (Rest-Assured clients, DTOs)
    │        ├─ data/ (TestNG data providers, fixtures)
@@ -193,18 +193,34 @@ The framework auto-detects CI environments (`JENKINS_HOME`, `CI` env vars) and a
 - Applies Docker-compatible Chrome/Firefox flags (`--no-sandbox`, `--disable-dev-shm-usage`)
 - Switches to RemoteWebDriver when `selenium.grid.url` system property or `SELENIUM_GRID_URL` env var is set
 
+#### Custom Jenkins Image
+The `Dockerfile.jenkins` builds a customized Jenkins container with:
+- **Java 21 (OpenJDK)** - Matches framework requirements
+- **Maven 3.9.9** - Pre-installed for faster builds
+- **Allure 2.27.0** - Pre-configured at `/opt/allure-2.27.0` for HTML report generation
+- **Docker CLI** - Enables Docker-in-Docker scenarios if needed
+- **CSP Policy** - Custom Content Security Policy allowing Allure report JavaScript/CSS to load properly
+
+The CSP configuration in `docker-compose.yml` (`JAVA_OPTS=-Dhudson.model.DirectoryBrowserSupport.CSP=...`) is required for Allure HTML reports to render correctly in Jenkins UI. Without it, reports show infinite loading due to blocked inline scripts.
+
 #### Architecture
-Docker Compose uses **STANDALONE Grid architecture** where each browser runs in its own isolated container with built-in Grid hub. This provides:
-- ✅ Simple setup and configuration
+Docker Compose orchestrates three services:
+1. **Jenkins** - CI/CD server with Java 21, Maven, and Allure pre-installed
+2. **Chrome Standalone Grid** - Selenium Grid with Chrome browser (ARM64-compatible via seleniarm)
+3. **Firefox Standalone Grid** - Selenium Grid with Firefox browser (ARM64-compatible via seleniarm)
+
+Each browser runs in its own isolated container with built-in Grid hub. This provides:
+- ✅ Simple setup and configuration (no separate hub required)
 - ✅ Independent browser isolation
 - ✅ Easy scaling (add container = add browser capacity)
 - ✅ Separate Grid UI per browser for better debugging
+- ✅ Built-in VNC server for real-time test watching
+- ✅ Apple Silicon (M1/M2/M3) native support via seleniarm images
 
 #### Quick Start with Docker Compose
 
-**For Apple Silicon (M1/M2/M3 Macs):**
 ```bash
-# Uses seleniarm ARM64-compatible images
+# Start all services (Jenkins + Chrome Grid + Firefox Grid)
 docker compose up -d
 
 # Check status
@@ -213,13 +229,15 @@ docker ps
 # Access services
 # Jenkins: http://localhost:8080
 # Chrome Grid: http://localhost:4444/ui
+# Firefox Grid: http://localhost:4445/ui
 # Chrome VNC: http://localhost:7900 (password: secret)
+# Firefox VNC: http://localhost:7901 (password: secret)
 ```
 
-**Note:** Use `docker compose` (without hyphen) for Docker Compose v2. On Apple Silicon, the framework uses `seleniarm/standalone-chromium` and `seleniarm/standalone-firefox` images optimized for ARM64 architecture.
-
-**For Intel/AMD64 systems:**
-Alternative Hub+Nodes architecture available in `docker-compose-hub.yml` for centralized Grid management.
+**Notes:** 
+- Use `docker compose` (without hyphen) for Docker Compose v2
+- On Apple Silicon (M1/M2/M3), uses `seleniarm/standalone-chromium` and `seleniarm/standalone-firefox` optimized for ARM64 architecture
+- On Intel/AMD64, Docker will automatically use AMD64 layers from the same images
 
 #### Accessing Services
 
@@ -298,11 +316,12 @@ Retain `target/screenshots` and `target/allure-results` as build artifacts. Use 
 - **CDP mismatch warnings** appear until Selenium ships matching DevTools version for the installed Chrome build; safe to ignore unless debugging DevTools APIs.
 
 ### Docker/Grid Issues
-- **"no matching manifest for linux/arm64/v8"**: You're on Apple Silicon (M1/M2/M3). The `docker-compose.yml` uses ARM64-compatible `seleniarm` images. Use `docker compose up -d` (v2 CLI).
-- **Port already in use**: Check if Jenkins/Grid is already running: `lsof -ti:8080 | xargs kill -9` to free port 8080.
-- **SessionNotCreated error**: Ensure Grid containers are healthy: `docker ps` and `curl http://localhost:4444/status`. Check logs: `docker logs selenium-chrome`.
-- **Tests hang in Grid**: Watch via VNC (`http://localhost:7900`, password: `secret`) to see what's happening in the browser.
+- **"no matching manifest for linux/arm64/v8"**: Platform mismatch. The `docker-compose.yml` includes platform directives. Ensure you're using Docker Desktop with proper architecture support.
+- **Port already in use**: Check if services are already running: `lsof -ti:8080 | xargs kill -9` to free port 8080.
+- **SessionNotCreated error**: Ensure Grid containers are healthy: `docker ps` shows "Up" status and `curl http://localhost:4444/status` returns ready. Check logs: `docker logs selenium-chrome`.
+- **Tests hang in Grid**: Watch via VNC (`http://localhost:7900`, password: `secret`) to see what's happening in the browser in real-time.
 - **Jenkins password not found**: Wait 30-60 seconds after `docker compose up -d`, then run: `docker exec jenkins-selenium cat /var/jenkins_home/secrets/initialAdminPassword`.
+- **Allure Report button missing in Jenkins**: See [Allure Reporting](#allure-reporting) section for detailed setup steps.
 
 ### Common Commands
 ```bash
