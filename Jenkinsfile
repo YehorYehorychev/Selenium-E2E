@@ -48,6 +48,9 @@ pipeline {
             steps {
                 echo "Compiling project..."
                 sh 'mvn compile test-compile'
+
+                echo "Verifying Allure installation..."
+                sh 'allure --version || echo "WARNING: Allure not found in PATH"'
             }
         }
 
@@ -98,6 +101,11 @@ pipeline {
             // Generate Allure Report
             script {
                 echo "Generating Allure report..."
+
+                // Check if allure results exist
+                sh 'ls -la target/allure-results/ || echo "No allure-results found"'
+                sh 'find target/allure-results -type f | head -10 || echo "No files in allure-results"'
+
                 allure([
                     includeProperties: false,
                     jdk: '',
