@@ -1,11 +1,45 @@
 # Selenium Framework
 
+## Repository Branches
+
+This repository maintains two parallel implementations:
+
+### 🌿 **`main` branch** - TestNG Framework
+Traditional TestNG-based automation framework with:
+- Direct TestNG test classes with `@Test` annotations
+- TestNG data providers for parameterization
+- TestNG suite XML files for execution control
+- Page Object Model with direct method calls from tests
+
+### 🥒 **`cucumber` branch** - Cucumber BDD Framework
+Behavior-Driven Development implementation with:
+- **Gherkin feature files** (`.feature`) with Given-When-Then scenarios
+- **Step definitions** mapping Gherkin steps to Java code
+- **Scenario context** for sharing state between steps
+- **Examples tables** for data-driven scenarios
+- **Cucumber TestNG runner** for execution
+- Same Page Objects, helpers, and infrastructure as `main`
+
+**Choose the branch based on your preference:**
+- Use **`main`** for traditional TestNG approach with programmatic test definitions
+- Use **`cucumber`** for BDD style with business-readable Gherkin scenarios
+
+Both branches share:
+- ✅ Same tech stack (Selenium, Allure, Docker, Jenkins)
+- ✅ Same Page Object Model
+- ✅ Same helper utilities (WaitHelper, ScreenshotHelper, etc.)
+- ✅ Same CI/CD setup (Jenkinsfile, docker-compose.yml)
+- ✅ Same configuration management (config.properties)
+
+---
+
 ## Overview
-Resilient UI/API automation framework built with Java 21+, Maven, and TestNG. It drives Page Object Model coverage for multiple sample applications (GreenKart, Shopping, Amazon, Flight Booking, Practice Page, etc.) while reusing a common `BaseTest`, rich Page Objects, helper utilities (waits, screenshots, API clients, JSON readers), and Allure reporting hooks.
+Resilient UI/API automation framework built with Java 21+, Maven, and TestNG/Cucumber. It drives Page Object Model coverage for multiple sample applications (GreenKart, Shopping, Amazon, Flight Booking, Practice Page, etc.) while reusing a common `BaseTest`, rich Page Objects, helper utilities (waits, screenshots, API clients, JSON readers), and Allure reporting hooks.
 
 ## Tech Stack
 - Selenium 4.38.0 (WebDriver, RemoteWebDriver, DevTools, waits) orchestrated via WebDriverManager 5.9.2 for automatic binary provisioning.
-- TestNG 7.11.0 as the primary runner (suite control, data providers, listeners, parallelism).
+- **TestNG 7.11.0** as the primary runner (suite control, data providers, listeners, parallelism).
+- **Cucumber 7.33.0** (on `cucumber` branch) - BDD framework with Gherkin syntax for business-readable test scenarios.
 - SLF4J logging, Allure TestNG adapter 2.27.0, AShot 1.5.4 for full-page screenshots.
 - Jackson 2.18.x, custom `JsonDataHelper`, and REST-assured 5.5.6 for API-driven flows (e.g., shopping authentication token).
 - Faker (DataFaker 2.3.1) + Lombok (records, `@SneakyThrows`) for concise, randomized test data factories.
@@ -13,6 +47,8 @@ Resilient UI/API automation framework built with Java 21+, Maven, and TestNG. It
 - Docker Compose for Jenkins + Selenium Grid CI environment.
 
 ## Project Layout
+
+### Common Structure (both branches)
 ```
 pom.xml
 Jenkinsfile
@@ -30,6 +66,10 @@ src
 │        ├─ practice/
 │        ├─ shopping/
 │        └─ common/{BasePage,components}
+```
+
+### TestNG Branch (`main`)
+```
 └─ test
    ├─ java/com/yehorychev/selenium
    │  ├─ core/BaseTest.java
@@ -51,6 +91,34 @@ src
       └─ testng*.xml          (Multiple suite files per module)
 ```
 
+### Cucumber Branch (`cucumber`)
+```
+└─ test
+   ├─ java/com/yehorychev/selenium
+   │  ├─ core/BaseTest.java
+   │  ├─ runner/CucumberTestRunner.java
+   │  ├─ context/ScenarioContext.java
+   │  ├─ hooks/CucumberHooks.java
+   │  ├─ listeners/AllureTestListener.java
+   │  ├─ steps/                (Step definitions)
+   │  │  ├─ amazon/
+   │  │  ├─ flightbooking/
+   │  │  ├─ greenkart/
+   │  │  ├─ practice/
+   │  │  └─ shopping/
+   │  └─ tests/shopping/api/    (Rest-Assured clients, DTOs)
+   └─ resources
+      ├─ assets/data/*.json
+      ├─ features/              (Gherkin scenarios)
+      │  ├─ amazon.feature
+      │  ├─ flightbooking.feature
+      │  ├─ greenkart.feature
+      │  ├─ practice.feature
+      │  └─ shopping.feature
+      ├─ config.properties
+      └─ testng-cucumber.xml
+```
+
 ## Configuration
 `src/test/resources/config.properties` centralizes runtime knobs:
 - `base.url.*` entries per application (shopping, amazon, practice, etc.).
@@ -67,10 +135,18 @@ Any property is overrideable at runtime: `mvn test -Dbrowser=firefox -Dbase.url.
 - Shopping API utilities (REST-assured clients) reuse both fixture data and Faker output to bootstrap UI tests with tokens/cookies when necessary.
 
 ## Running Tests
+
+### TestNG Branch (`main`)
 Full suite:
 ```bash
 mvn clean test
 ```
+
+Run specific suite:
+```bash
+mvn clean test -DsuiteXmlFile=src/test/resources/testng-shopping.xml
+```
+
 Common overrides:
 - Target a specific module: `mvn clean test -Dtest=ShoppingProductsTest` (class) or from IDE.
 - Switch browser: `mvn clean test -Dbrowser=firefox` (Chrome, Firefox, Safari supported; Safari guarded by locking due to driver limitations).
@@ -79,6 +155,35 @@ Common overrides:
 - Adjust waits/screenshots inline (e.g., `-Dwait.default.seconds=10`).
 
 Parallelism is configured in `testng.xml` (methods-level by default). Increase/decrease `thread-count` depending on infrastructure capacity.
+
+### Cucumber Branch (`cucumber`)
+Run all Cucumber scenarios:
+```bash
+mvn clean test -DsuiteXmlFile=src/test/resources/testng-cucumber.xml
+```
+
+Run with Cucumber tags:
+```bash
+mvn clean test -Dcucumber.filter.tags="@Shopping"
+mvn clean test -Dcucumber.filter.tags="@Critical and not @Broken"
+```
+
+Run specific feature file:
+```bash
+mvn clean test -Dcucumber.features=src/test/resources/features/shopping.feature
+```
+
+**Cucumber-specific features:**
+- **Gherkin scenarios** in `.feature` files describe test cases in plain English
+- **Examples tables** in Scenario Outlines provide data-driven testing
+- **Step definitions** map Gherkin steps to Java code
+- **ScenarioContext** shares state between steps within a scenario
+- **Hooks** (`@Before`, `@After`) handle WebDriver lifecycle per scenario
+
+Same runtime overrides apply:
+- Browser selection: `-Dbrowser=chrome`
+- Headless mode: `-Dbrowser.headless.enabled=true`
+- Configuration properties: `-Dbase.url.shopping=https://...`
 
 ## Screenshots & Diagnostics
 - `ScreenshotHelper` (AShot) captures full-page PNGs either for every test or failures only based on configuration; outputs stored under `screenshot.directory` and auto-attached to Allure.
@@ -307,6 +412,60 @@ Retain `target/screenshots` and `target/allure-results` as build artifacts. Use 
 - Page source HTML for debugging
 - Browser console logs
 - Step-by-step execution timeline
+
+## Cucumber BDD Examples (`cucumber` branch)
+
+### Sample Gherkin Scenario
+From `shopping.feature`:
+```gherkin
+@Shopping @E2E @Critical
+Feature: Shopping E2E Flow
+  As a customer
+  I want to search, purchase products, and complete checkout
+  So that I can buy items online
+
+  Background:
+    Given I am logged in via API with email "yehor_test@test.com" and password "Admin123456!"
+    When I navigate to the dashboard
+
+  Scenario Outline: Complete end-to-end shopping flow
+    When I search for product "<productName>"
+    And I add the product to cart
+    Then the cart count should be "1"
+    When I open the cart
+    Then the product "<productName>" should be in the cart
+    And the product price should be "<productPrice>"
+    When I proceed to checkout
+    And I fill checkout form with shipping country "<country>"
+    And I place the order
+    Then I should see the order confirmation
+    And the order should contain product "<productName>"
+    And the order total should be "<productPrice>"
+
+    Examples:
+      | productName  | productPrice | country        |
+      | ZARA COAT 3  | $ 11500      | United States  |
+```
+
+### Key Benefits of Cucumber Branch
+1. **Business-readable scenarios** - Non-technical stakeholders can understand tests
+2. **Reusable steps** - Step definitions can be used across multiple scenarios
+3. **Data-driven testing** - Examples tables provide parameterization without code duplication
+4. **Clear separation** - Gherkin (what to test) vs Step Definitions (how to test)
+5. **Better collaboration** - BAs, QAs, and Devs speak the same language
+
+### Cucumber vs TestNG Comparison
+
+| Aspect | TestNG (`main`) | Cucumber (`cucumber`) |
+|--------|----------------|----------------------|
+| Test Definition | Java methods with `@Test` | Gherkin `.feature` files |
+| Readability | Code-focused | Business-focused |
+| Parameterization | `@DataProvider` | `Examples:` tables |
+| Execution | TestNG XML suites | Cucumber runner + tags |
+| Learning Curve | Lower (Java devs) | Higher (Gherkin syntax) |
+| Best For | Technical teams, API tests | Cross-functional teams, BDD |
+
+Both approaches use the **same Page Object Model** and infrastructure, so you can switch between branches without rewriting Page Objects.
 
 ## Troubleshooting
 
