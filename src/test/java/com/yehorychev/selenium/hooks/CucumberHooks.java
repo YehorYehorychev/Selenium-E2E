@@ -250,7 +250,7 @@ public class CucumberHooks {
         } else if (tags.contains("@Practice")) {
             return ConfigProperties.getProperty("base.url.practice.page");
         } else if (tags.contains("@GreenKart")) {
-            return ConfigProperties.getProperty("base.url.greenkart");
+            return ConfigProperties.getProperty("base.url.green.kart");
         } else if (tags.contains("@FlightBooking")) {
             return ConfigProperties.getProperty("base.url.flight.booking");
         }

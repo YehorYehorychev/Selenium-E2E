@@ -9,8 +9,6 @@ import com.yehorychev.selenium.tests.shopping.api.helpers.ShoppingSession;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.qameta.allure.Allure;
-import io.qameta.allure.Step;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
@@ -37,73 +35,63 @@ public class ShoppingLoginSteps {
 
     @Given("the shopping application is opened")
     public void openShoppingApp() {
-        Allure.step("Open shopping application", () -> {
-            String url = ConfigProperties.getProperty("base.url.shopping");
-            logger.info("Opening shopping application: {}", url);
-            driver.get(url);
-            loginPage = new LoginPage(driver, waitHelper);
-        });
+        String url = ConfigProperties.getProperty("base.url.shopping");
+        logger.info("Opening shopping application: {}", url);
+        driver.get(url);
+        loginPage = new LoginPage(driver, waitHelper);
     }
 
     @When("I login with email {string} and password {string}")
     public void loginWithCredentials(String email, String password) {
-        Allure.step("Login with email: " + email, () -> {
-            logger.info("Logging in with email: {}", email);
-            loginPage.login(email, password);
-        });
+        logger.info("Logging in with email: {}", email);
+        loginPage.login(email, password);
     }
 
     @Given("I am logged in via API with email {string} and password {string}")
     public void loginViaAPI(String email, String password) {
-        Allure.step("Login via API with email: " + email, () -> {
-            logger.info("Logging in via API with email: {}", email);
+        logger.info("Logging in via API with email: {}", email);
 
-            // Get auth token via API
-            ShoppingApiAuthClient apiClient = new ShoppingApiAuthClient();
-            ShoppingSession session = apiClient.login(email, password);
+        // Get auth token via API
+        ShoppingApiAuthClient apiClient = new ShoppingApiAuthClient();
+        ShoppingSession session = apiClient.login(email, password);
 
-            logger.info("Auth token received: {}", session.token().substring(0, 20) + "...");
+        logger.info("Auth token received: {}", session.token().substring(0, 20) + "...");
 
-            // Store in context for other steps
-            context.set("authToken", session.token());
-            context.set("userId", session.userId());
+        // Store in context for other steps
+        context.set("authToken", session.token());
+        context.set("userId", session.userId());
 
-            // Navigate to shopping site first
-            String url = ConfigProperties.getProperty("base.url.shopping");
-            driver.get(url);
+        // Navigate to shopping site first
+        String url = ConfigProperties.getProperty("base.url.shopping");
+        driver.get(url);
 
-            // Inject token into browser localStorage
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript(String.format(
-                "window.localStorage.setItem('token', '%s');", session.token()
-            ));
-            js.executeScript(String.format(
-                "window.localStorage.setItem('userId', '%s');", session.userId()
-            ));
+        // Inject token into browser localStorage
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(String.format(
+            "window.localStorage.setItem('token', '%s');", session.token()
+        ));
+        js.executeScript(String.format(
+            "window.localStorage.setItem('userId', '%s');", session.userId()
+        ));
 
-            logger.info("Token injected into localStorage");
-        });
+        logger.info("Token injected into localStorage");
     }
 
     @When("I navigate to the dashboard")
     public void navigateToDashboard() {
-        Allure.step("Navigate to dashboard", () -> {
-            String dashboardUrl = ConfigProperties.getProperty("base.url.shopping") + "/dashboard";
-            logger.info("Navigating to dashboard: {}", dashboardUrl);
-            driver.get(dashboardUrl);
-        });
+        String dashboardUrl = ConfigProperties.getProperty("base.url.shopping") + "/dashboard";
+        logger.info("Navigating to dashboard: {}", dashboardUrl);
+        driver.get(dashboardUrl);
     }
 
     @Then("the {string} button should be visible")
     public void buttonShouldBeVisible(String buttonText) {
-        Allure.step("Verify button is visible: " + buttonText, () -> {
-            logger.info("Verifying button is visible: {}", buttonText);
-            // This will be implemented in DashboardSteps or CommonSteps
-            // For now, just verify page loaded
-            assertTrue(driver.getCurrentUrl().contains("dashboard") ||
-                      driver.getCurrentUrl().contains("client"),
-                      "Should be on authenticated page");
-        });
+        logger.info("Verifying button is visible: {}", buttonText);
+        // This will be implemented in DashboardSteps or CommonSteps
+        // For now, just verify page loaded
+        assertTrue(driver.getCurrentUrl().contains("dashboard") ||
+                  driver.getCurrentUrl().contains("client"),
+                  "Should be on authenticated page");
     }
 }
 

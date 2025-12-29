@@ -30,18 +30,23 @@ public class GreenKartSteps {
     @When("I add the following vegetables to cart:")
     public void iAddTheFollowingVegetablesToCart(DataTable dataTable) {
         GreenKartHomePage homePage = context.get("homePage");
-        List<String> vegetables = dataTable.asList();
 
-        // First row is header, get actual data from second row
-        String vegetablesStr = vegetables.get(1);
+        // DataTable.asList() returns all cells; skip header
+        List<String> vegetables = dataTable.asList();
+        if (vegetables.isEmpty()) {
+            throw new IllegalArgumentException("No vegetables provided in the table");
+        }
+
+        // Skip header row ("vegetables"), get the actual CSV value
+        String vegetablesStr = vegetables.size() > 1 ? vegetables.get(1) : vegetables.get(0);
         String[] vegArray = vegetablesStr.split(",");
 
         homePage.addVegetables(vegArray);
         context.set("addedVegetables", vegArray);
     }
 
-    @Then("the cart count should be {string}")
-    public void theCartCountShouldBe(String count) {
+    @Then("the GreenKart cart count should be {string}")
+    public void theGreenKartCartCountShouldBe(String count) {
         GreenKartHomePage homePage = context.get("homePage");
         int expectedCount = Integer.parseInt(count);
         Assert.assertTrue(homePage.cartContainsCount(expectedCount),
@@ -55,8 +60,8 @@ public class GreenKartSteps {
         context.set("cartOverlay", cartOverlay);
     }
 
-    @When("I proceed to checkout")
-    public void iProceedToCheckout() {
+    @When("I proceed to checkout from the overlay")
+    public void iProceedToCheckoutFromOverlay() {
         CartOverlay cartOverlay = context.get("cartOverlay");
         CheckoutPage checkoutPage = cartOverlay.proceedToCheckout();
         context.set("checkoutPage", checkoutPage);
@@ -67,8 +72,12 @@ public class GreenKartSteps {
         CheckoutPage checkoutPage = context.get("checkoutPage");
         List<String> expectedNamesRaw = dataTable.asList();
 
-        // First row is header, get actual data
-        String expectedNamesStr = expectedNamesRaw.get(1);
+        if (expectedNamesRaw.isEmpty()) {
+            throw new IllegalArgumentException("No expected names provided in the table");
+        }
+
+        // Skip header row, get the actual CSV value
+        String expectedNamesStr = expectedNamesRaw.size() > 1 ? expectedNamesRaw.get(1) : expectedNamesRaw.get(0);
         List<String> expectedNames = List.of(expectedNamesStr.split(","));
 
         String[] addedVegetables = context.get("addedVegetables");

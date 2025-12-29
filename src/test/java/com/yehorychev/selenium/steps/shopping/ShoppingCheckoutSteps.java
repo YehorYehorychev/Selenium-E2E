@@ -7,7 +7,6 @@ import com.yehorychev.selenium.pages.shopping.OrderConfirmationPage;
 import com.yehorychev.selenium.tests.shared.data.TestDataFactory;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.qameta.allure.Allure;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,72 +34,62 @@ public class ShoppingCheckoutSteps {
 
     @When("I fill checkout form with shipping country {string}")
     public void fillCheckoutForm(String country) {
-        Allure.step("Fill checkout form with country: " + country, () -> {
-            logger.info("Filling checkout form with country: {}", country);
-            checkoutPage = new CheckoutPage(driver, waitHelper);
+        logger.info("Filling checkout form with country: {}", country);
+        checkoutPage = new CheckoutPage(driver, waitHelper);
 
-            // Generate random customer data
-            TestDataFactory.ShoppingCardDetails cardDetails = TestDataFactory.randomShoppingCard();
+        // Generate random customer data
+        TestDataFactory.ShoppingCardDetails cardDetails = TestDataFactory.randomShoppingCard();
 
-            checkoutPage.enterCreditCardNumber(cardDetails.cardNumber())
-                       .enterCvv(cardDetails.cvv())
-                       .selectExpiryMonth(cardDetails.expiryMonth())
-                       .selectExpiryYear(cardDetails.expiryYear())
-                       .enterName(TestDataFactory.randomFullName())
-                       .selectCountry("United", country);
+        checkoutPage.enterCreditCardNumber(cardDetails.cardNumber())
+                   .enterCvv(cardDetails.cvv())
+                   .selectExpiryMonth(cardDetails.expiryMonth())
+                   .selectExpiryYear(cardDetails.expiryYear())
+                   .enterName(TestDataFactory.randomFullName())
+                   .selectCountry("United", country);
 
-            logger.info("Checkout form filled with generated data");
-        });
+        logger.info("Checkout form filled with generated data");
     }
 
     @When("I place the order")
     public void placeOrder() {
-        Allure.step("Place order", () -> {
-            logger.info("Placing order");
-            if (checkoutPage == null) {
-                checkoutPage = new CheckoutPage(driver, waitHelper);
-            }
-            checkoutPage.placeOrder();
-            confirmationPage = new OrderConfirmationPage(driver, waitHelper);
-        });
+        logger.info("Placing order");
+        if (checkoutPage == null) {
+            checkoutPage = new CheckoutPage(driver, waitHelper);
+        }
+        checkoutPage.placeOrder();
+        confirmationPage = new OrderConfirmationPage(driver, waitHelper);
     }
 
     @Then("I should see the order confirmation")
     public void verifyOrderConfirmation() {
-        Allure.step("Verify order confirmation page", () -> {
-            logger.info("Verifying order confirmation");
-            if (confirmationPage == null) {
-                confirmationPage = new OrderConfirmationPage(driver, waitHelper);
-            }
-            assertTrue(confirmationPage.isLoaded(),
-                      "Order confirmation page should be displayed");
-        });
+        logger.info("Verifying order confirmation");
+        if (confirmationPage == null) {
+            confirmationPage = new OrderConfirmationPage(driver, waitHelper);
+        }
+        assertTrue(confirmationPage.isLoaded(),
+                  "Order confirmation page should be displayed");
     }
 
     @Then("the order should contain product {string}")
     public void verifyOrderProduct(String productName) {
-        Allure.step("Verify order contains product: " + productName, () -> {
-            logger.info("Verifying order contains product: {}", productName);
-            if (confirmationPage == null) {
-                confirmationPage = new OrderConfirmationPage(driver, waitHelper);
-            }
-            String actualProduct = confirmationPage.getProductName();
-            assertEquals(actualProduct, productName,
-                        "Order should contain correct product");
-        });
+        logger.info("Verifying order contains product: {}", productName);
+        if (confirmationPage == null) {
+            confirmationPage = new OrderConfirmationPage(driver, waitHelper);
+        }
+        String actualProduct = confirmationPage.getProductName();
+        assertEquals(actualProduct, productName,
+                    "Order should contain correct product");
     }
 
     @Then("the order total should be {string}")
     public void verifyOrderTotal(String expectedTotal) {
-        Allure.step("Verify order total: " + expectedTotal, () -> {
-            logger.info("Verifying order total: {}", expectedTotal);
-            if (confirmationPage == null) {
-                confirmationPage = new OrderConfirmationPage(driver, waitHelper);
-            }
-            String actualTotal = confirmationPage.getProductPrice();
-            assertEquals(actualTotal, expectedTotal,
-                        "Order total should match");
-        });
+        logger.info("Verifying order total: {}", expectedTotal);
+        if (confirmationPage == null) {
+            confirmationPage = new OrderConfirmationPage(driver, waitHelper);
+        }
+        String actualTotal = confirmationPage.getProductPrice();
+        assertEquals(actualTotal, expectedTotal,
+                    "Order total should match");
     }
 }
 

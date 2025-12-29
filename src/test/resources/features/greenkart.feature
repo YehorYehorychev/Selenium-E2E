@@ -12,9 +12,9 @@ Feature: GreenKart Shopping
     When I add the following vegetables to cart:
       | vegetables   |
       | <vegetables> |
-    Then the cart count should be "<count>"
+    Then the GreenKart cart count should be "<count>"
     When I open the cart overlay
-    And I proceed to checkout
+    And I proceed to checkout from the overlay
     Then the cart should contain:
       | expectedNames   |
       | <expectedNames> |
@@ -31,9 +31,9 @@ Feature: GreenKart Shopping
     When I add the following vegetables to cart:
       | vegetables   |
       | <vegetables> |
-    Then the cart count should be "<count>"
+    Then the GreenKart cart count should be "<count>"
     When I open the cart overlay
-    And I proceed to checkout
+    And I proceed to checkout from the overlay
     Then the products in cart should be sorted alphabetically
 
     Examples:
