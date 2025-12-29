@@ -185,4 +185,27 @@ public class ConfigProperties {
     public static double getFullPageDevicePixelRatio() {
         return Double.parseDouble(properties.getProperty("screenshot.fullpage.device.pixel.ratio", "1.0"));
     }
+
+    /**
+     * Get browser type from system property or config (default: chrome)
+     */
+    public static String getBrowser() {
+        return System.getProperty("browser", properties.getProperty("browser", "chrome"));
+    }
+
+    /**
+     * Check if headless mode is enabled
+     */
+    public static boolean isHeadless() {
+        return Boolean.parseBoolean(System.getProperty("headless",
+            properties.getProperty("headless", "false")));
+    }
+
+    /**
+     * Get Selenium Grid URL if configured
+     */
+    public static String getSeleniumGridUrl() {
+        return System.getProperty("selenium.grid.url",
+            properties.getProperty("selenium.grid.url", ""));
+    }
 }

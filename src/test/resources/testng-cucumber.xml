@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Cucumber Test Suite" parallel="methods" thread-count="4" verbose="1">
+    <test name="Cucumber BDD Tests">
+        <classes>
+            <class name="com.yehorychev.selenium.runner.CucumberTestRunner"/>
+        </classes>
+    </test>
+</suite>
+
