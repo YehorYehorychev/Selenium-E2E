@@ -18,6 +18,11 @@ services:
     networks:
       - selenium-grid
 
+  # ========================================
+  # Selenium Grid Browsers for ARM64 (Apple Silicon M1/M2/M3)
+  # ========================================
+  # Use these configurations if you have Apple Silicon Mac
+
   chrome:
     image: seleniarm/standalone-chromium:latest
     container_name: selenium-chrome
@@ -45,6 +50,54 @@ services:
       - SE_NODE_SESSION_TIMEOUT=300
     networks:
       - selenium-grid
+
+  # ========================================
+  # Selenium Grid Browsers for Intel/AMD (x86_64)
+  # ========================================
+  # If you have Intel Mac or Windows with Intel/AMD processor,
+  # comment out the ARM64 sections above and uncomment these:
+
+#  chrome:
+#    image: selenium/standalone-chrome:latest
+#    container_name: selenium-chrome
+#    platform: linux/amd64
+#    shm_size: 2gb
+#    ports:
+#      - "4444:4444"
+#      - "7900:7900"
+#    environment:
+#      - SE_NODE_MAX_SESSIONS=4
+#      - SE_NODE_SESSION_TIMEOUT=300
+#    networks:
+#      - selenium-grid
+
+#  firefox:
+#    image: selenium/standalone-firefox:latest
+#    container_name: selenium-firefox
+#    platform: linux/amd64
+#    shm_size: 2gb
+#    ports:
+#      - "4445:4444"
+#      - "7901:7900"
+#    environment:
+#      - SE_NODE_MAX_SESSIONS=4
+#      - SE_NODE_SESSION_TIMEOUT=300
+#    networks:
+#      - selenium-grid
+
+#  edge:
+#    image: selenium/standalone-edge:latest
+#    container_name: selenium-edge
+#    platform: linux/amd64
+#    shm_size: 2gb
+#    ports:
+#      - "4446:4444"
+#      - "7902:7900"
+#    environment:
+#      - SE_NODE_MAX_SESSIONS=4
+#      - SE_NODE_SESSION_TIMEOUT=300
+#    networks:
+#      - selenium-grid
 
 volumes:
   jenkins_home:
