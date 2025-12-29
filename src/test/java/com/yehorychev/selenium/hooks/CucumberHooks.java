@@ -2,11 +2,9 @@ package com.yehorychev.selenium.hooks;
 
 import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.context.ScenarioContext;
-import com.yehorychev.selenium.core.BaseTest;
 import com.yehorychev.selenium.helpers.ScreenshotHelper;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import io.cucumber.java.After;
-import io.cucumber.java.AfterStep;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -65,6 +63,13 @@ public class CucumberHooks {
         context.setWaitHelper(waitHelper);
 
         logger.info("WebDriver initialized: {} (headless: {})", browser, headless);
+
+        // Navigate to base URL based on scenario tags
+        String baseUrl = determineBaseUrl(scenario);
+        if (baseUrl != null && !baseUrl.isEmpty()) {
+            driver.get(baseUrl);
+            logger.info("Navigated to base URL: {}", baseUrl);
+        }
     }
 
     @After(order = 0)
@@ -230,6 +235,28 @@ public class CucumberHooks {
             options.addArguments("--height=1080");
         }
         return options;
+    }
+
+    /**
+     * Determine base URL based on scenario tags
+     */
+    private String determineBaseUrl(Scenario scenario) {
+        var tags = scenario.getSourceTagNames();
+
+        if (tags.contains("@Shopping")) {
+            return ConfigProperties.getProperty("base.url.shopping");
+        } else if (tags.contains("@Amazon")) {
+            return ConfigProperties.getProperty("base.url.amazon");
+        } else if (tags.contains("@Practice")) {
+            return ConfigProperties.getProperty("base.url.practice.page");
+        } else if (tags.contains("@GreenKart")) {
+            return ConfigProperties.getProperty("base.url.greenkart");
+        } else if (tags.contains("@FlightBooking")) {
+            return ConfigProperties.getProperty("base.url.flight.booking");
+        }
+
+        // Default to shopping if no tag matches
+        return ConfigProperties.getProperty("base.url.shopping");
     }
 }
 
