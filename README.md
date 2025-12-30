@@ -75,7 +75,7 @@ Feature Files (Gherkin)  →  Step Definitions (Java)  →  Page Objects  →  S
 
 ## 📁 Project Structure
 
-### 🥒 Cucumber Branch (BDD) - **Current**
+### 🥒 Cucumber Branch (BDD)
 
 ```
 src/main/java/com/yehorychev/selenium/
@@ -110,7 +110,7 @@ src/test/resources/
 docker-compose.yml, Jenkinsfile            # CI/CD infrastructure (shared)
 ```
 
-### 🧪 TestNG Branch (Traditional) - `main`
+### 🧪 TestNG Branch (Traditional) - **Current**
 
 ```
 src/main/java/com/yehorychev/selenium/
