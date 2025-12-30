@@ -35,7 +35,7 @@ This repository showcases **two parallel test automation implementations** using
 
 ---
 
-## 🥒 Cucumber Branch (BDD) - **You Are Here**
+## 🥒 Cucumber Branch (BDD)
 
 ### What Makes It Special
 ```gherkin
@@ -47,7 +47,7 @@ Scenario: Complete checkout
   Then order confirmation should appear
 ```
 
-**vs Traditional TestNG:**
+**vs Traditional TestNG:** - **You Are Here**
 ```java
 @Test
 public void shouldCompleteCheckout() {
