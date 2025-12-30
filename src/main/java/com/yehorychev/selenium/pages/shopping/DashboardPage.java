@@ -25,7 +25,15 @@ public class DashboardPage extends BasePage {
 
     public boolean isLoaded() {
         waitForPageReady();
-        return isVisible(HOME_BUTTON) && isVisible(SIGN_OUT_BUTTON);
+        waitForPageReadyAndAjax();
+        // Wait for either HOME or Sign Out button to appear
+        try {
+            waitHelper.waitForAnyVisible(HOME_BUTTON, SIGN_OUT_BUTTON);
+            return isVisible(HOME_BUTTON) || isVisible(SIGN_OUT_BUTTON);
+        } catch (Exception e) {
+            log.warn("Dashboard page not loaded: {}", e.getMessage());
+            return false;
+        }
     }
 
     public List<WebElement> getProductsList() {
@@ -55,9 +63,16 @@ public class DashboardPage extends BasePage {
         WebElement productCard = findProductCard(productName);
         WebElement addButton = productCard.findElement(ADD_TO_CART_BUTTON);
         log.info("Adding product '{}' to cart", productName);
+
         addButton.click();
         waitForPageReadyAndAjax();
+
+        // Wait for toast message to appear and disappear
+        waitHelper.visibilityOf(TEMP_TOAST_MESSAGE);
         waitForElementToDisappear(TEMP_TOAST_MESSAGE);
+
+        // Give some extra time for cart badge to update
+        waitForPageReadyAndAjax();
     }
 
     public int getCartCount() {

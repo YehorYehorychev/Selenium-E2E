@@ -4,7 +4,7 @@ import com.yehorychev.selenium.context.ScenarioContext;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import com.yehorychev.selenium.pages.shopping.CheckoutPage;
 import com.yehorychev.selenium.pages.shopping.OrderConfirmationPage;
-import com.yehorychev.selenium.tests.shared.data.TestDataFactory;
+import com.yehorychev.selenium.utils.TestDataFactory;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.openqa.selenium.WebDriver;

@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.tests.shopping.api.helpers;
+package com.yehorychev.selenium.helpers.shopping;
 
 import com.yehorychev.selenium.config.ConfigProperties;
 import io.restassured.http.ContentType;
@@ -18,11 +18,15 @@ public class ShoppingApiAuthClient {
     private static final Logger log = LoggerFactory.getLogger(ShoppingApiAuthClient.class);
 
     public ShoppingSession loginWithConfiguredUser() {
-        return login(ConfigProperties.getShoppingUsername(), ConfigProperties.getShoppingPassword());
+        return login(
+            ConfigProperties.getProperty("shopping.user.email"),
+            ConfigProperties.getProperty("shopping.user.password")
+        );
     }
 
     public ShoppingSession login(String email, String password) {
         log.info("Requesting shopping token via API for user {}", email);
+
         Map<String, String> payload = Map.of(
                 "userEmail", email,
                 "userPassword", password
@@ -30,7 +34,7 @@ public class ShoppingApiAuthClient {
 
         Response response = given()
                 .baseUri(ConfigProperties.getShoppingApiBaseUrl())
-                .basePath("/auth/login")
+                .basePath("/api/ecom/auth/login")
                 .contentType(ContentType.JSON)
                 .body(payload)
                 .post()
@@ -42,6 +46,10 @@ public class ShoppingApiAuthClient {
         String token = response.path("token");
         String userId = response.path("userId");
         String message = response.path("message");
+
+        log.info("✅ Login successful. UserId: {}", userId);
+
         return new ShoppingSession(token, userId, email, message);
     }
 }
+

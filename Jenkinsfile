@@ -12,11 +12,6 @@ pipeline {
             choices: ['chrome', 'firefox', 'safari'],
             description: 'Browser to run tests on'
         )
-        choice(
-            name: 'TEST_SUITE',
-            choices: ['all', 'shopping', 'greenkart', 'amazon', 'flightbooking', 'practice'],
-            description: 'Test suite to execute'
-        )
         booleanParam(
             name: 'HEADLESS',
             defaultValue: true,
@@ -57,18 +52,16 @@ pipeline {
         stage('Run Tests') {
             steps {
                 script {
-                    def suiteFile = getSuiteFile(params.TEST_SUITE)
                     echo "=========================================="
-                    echo "Test Execution Configuration:"
-                    echo "  Suite: ${params.TEST_SUITE}"
+                    echo "Cucumber BDD Test Execution:"
                     echo "  Browser: ${params.BROWSER}"
                     echo "  Headless: ${params.HEADLESS}"
                     echo "  Grid URL: ${env.SELENIUM_GRID_URL}"
-                    echo "  Suite File: ${suiteFile}"
+                    echo "  Suite: testng-cucumber.xml"
                     echo "=========================================="
 
                     // Verify suite file exists
-                    sh "test -f ${suiteFile} && echo 'Suite file found' || echo 'WARNING: Suite file not found!'"
+                    sh "test -f src/test/resources/testng-cucumber.xml && echo 'Cucumber suite found' || echo 'WARNING: Suite file not found!'"
 
                     catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
                         sh """
@@ -76,7 +69,7 @@ pipeline {
                             -Dbrowser=${params.BROWSER} \
                             -Dheadless=${params.HEADLESS} \
                             -Dselenium.grid.url=${env.SELENIUM_GRID_URL} \
-                            -DsuiteXmlFile=${suiteFile} \
+                            -DsuiteXmlFile=src/test/resources/testng-cucumber.xml \
                             -Dallure.results.directory=target/allure-results
                         """
                     }
@@ -160,24 +153,6 @@ pipeline {
     }
 }
 
-def getSuiteFile(suite) {
-    switch(suite) {
-        case 'all':
-            return 'src/test/resources/testng.xml'
-        case 'shopping':
-            return 'src/test/resources/testng-shopping.xml'
-        case 'greenkart':
-            return 'src/test/resources/testng-greenkart.xml'
-        case 'amazon':
-            return 'src/test/resources/testng-amazon.xml'
-        case 'flightbooking':
-            return 'src/test/resources/testng-flightbooking.xml'
-        case 'practice':
-            return 'src/test/resources/testng-practice.xml'
-        default:
-            return 'src/test/resources/testng.xml'
-    }
-}
 
 def getSeleniumGridUrl(browser) {
     def gridHost = env.SELENIUM_GRID_HOST ?: 'selenium-chrome'

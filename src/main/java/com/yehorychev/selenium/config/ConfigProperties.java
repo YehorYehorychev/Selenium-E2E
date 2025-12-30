@@ -77,7 +77,7 @@ public class ConfigProperties {
 
     public static String getShoppingApiBaseUrl() {
         URI uri = URI.create(getShoppingLoginPageUrl());
-        return uri.getScheme() + "://" + uri.getHost() + "/api/ecom";
+        return uri.getScheme() + "://" + uri.getHost();
     }
 
     public static String getShoppingUsername() {

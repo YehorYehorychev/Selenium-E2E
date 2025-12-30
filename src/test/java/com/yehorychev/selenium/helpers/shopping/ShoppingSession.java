@@ -1,4 +1,4 @@
-package com.yehorychev.selenium.tests.shopping.api.helpers;
+package com.yehorychev.selenium.helpers.shopping;
 
 /**
  * Immutable representation of an authenticated shopping session retrieved via API.
@@ -12,4 +12,14 @@ public record ShoppingSession(String token, String userId, String userEmail, Str
             throw new IllegalArgumentException("UserId must not be null or blank");
         }
     }
+
+    // Backward compatibility getters
+    public String getToken() {
+        return token;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
 }
+

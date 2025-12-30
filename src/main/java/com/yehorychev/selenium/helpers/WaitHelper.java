@@ -203,6 +203,37 @@ public class WaitHelper {
         return getJsExecutor().executeScript(script, args);
     }
 
+    /**
+     * Wait for any of the specified locators to become visible
+     *
+     * @param locators Variable number of By locators
+     * @return First visible WebElement
+     */
+    public WebElement waitForAnyVisible(By... locators) {
+        try {
+            return new FluentWait<>(driver)
+                    .withTimeout(defaultTimeout)
+                    .pollingEvery(defaultPolling)
+                    .ignoreAll(DEFAULT_IGNORED)
+                    .until(d -> {
+                        for (By locator : locators) {
+                            try {
+                                WebElement element = d.findElement(locator);
+                                if (element.isDisplayed()) {
+                                    return element;
+                                }
+                            } catch (Exception ignored) {
+                                // Continue to next locator
+                            }
+                        }
+                        return null;
+                    });
+        } catch (TimeoutException e) {
+            throw new WaitTimeoutException(
+                    "Timed out waiting for any of " + locators.length + " locators to be visible", e);
+        }
+    }
+
     private JavascriptExecutor ensureJsExecutor(WebDriver candidate) {
         if (!(candidate instanceof JavascriptExecutor executor)) {
             throw new IllegalStateException("Driver does not support JavaScript execution");

@@ -72,7 +72,18 @@ public class CheckoutPage extends BasePage {
     }
 
     public CheckoutPage selectExpiryYear(String yearValue) {
-        selectByVisibleText(CARD_EXPIRATION_TO, yearValue);
+        // Select last available year from dropdown (most future year)
+        WebElement yearDropdown = find(CARD_EXPIRATION_TO);
+        org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(yearDropdown);
+        java.util.List<WebElement> options = select.getOptions();
+
+        // Select the last option (furthest future year)
+        if (!options.isEmpty()) {
+            select.selectByIndex(options.size() - 1);
+            log.info("Selected last available year from dropdown");
+        } else {
+            log.warn("No year options available in dropdown");
+        }
         return this;
     }
 

@@ -4,8 +4,8 @@ import com.yehorychev.selenium.config.ConfigProperties;
 import com.yehorychev.selenium.context.ScenarioContext;
 import com.yehorychev.selenium.helpers.WaitHelper;
 import com.yehorychev.selenium.pages.shopping.LoginPage;
-import com.yehorychev.selenium.tests.shopping.api.helpers.ShoppingApiAuthClient;
-import com.yehorychev.selenium.tests.shopping.api.helpers.ShoppingSession;
+import com.yehorychev.selenium.helpers.shopping.ShoppingApiAuthClient;
+import com.yehorychev.selenium.helpers.shopping.ShoppingSession;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -14,6 +14,7 @@ import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -60,21 +61,24 @@ public class ShoppingLoginSteps {
         // Store in context for other steps
         context.set("authToken", session.token());
         context.set("userId", session.userId());
+        context.set("userEmail", session.userEmail());
 
         // Navigate to shopping site first
         String url = ConfigProperties.getProperty("base.url.shopping");
         driver.get(url);
 
-        // Inject token into browser localStorage
+        // Inject token into browser localStorage (matching TestNG implementation)
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript(String.format(
-            "window.localStorage.setItem('token', '%s');", session.token()
-        ));
-        js.executeScript(String.format(
-            "window.localStorage.setItem('userId', '%s');", session.userId()
-        ));
+        js.executeScript("window.localStorage.setItem(arguments[0], arguments[1]);", "token", session.token());
+        js.executeScript("window.localStorage.setItem(arguments[0], arguments[1]);", "userEmail", session.userEmail());
+        js.executeScript("window.localStorage.setItem(arguments[0], arguments[1]);", "userId", session.userId());
 
-        logger.info("Token injected into localStorage");
+        logger.info("Token and user data injected into localStorage");
+
+        // Refresh page to apply the localStorage changes
+        driver.navigate().refresh();
+        waitHelper.waitForPageReady();
+        logger.info("Page refreshed to apply authentication");
     }
 
     @When("I navigate to the dashboard")
@@ -89,8 +93,9 @@ public class ShoppingLoginSteps {
         logger.info("Verifying button is visible: {}", buttonText);
         // This will be implemented in DashboardSteps or CommonSteps
         // For now, just verify page loaded
-        assertTrue(driver.getCurrentUrl().contains("dashboard") ||
-                  driver.getCurrentUrl().contains("client"),
+        String currentUrl = driver.getCurrentUrl();
+        assertNotNull(currentUrl, "Current URL should not be null");
+        assertTrue(currentUrl.contains("dashboard") || currentUrl.contains("client"),
                   "Should be on authenticated page");
     }
 }

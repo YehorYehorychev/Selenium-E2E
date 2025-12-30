@@ -13,7 +13,6 @@ public class AmazonHomePage extends BasePage {
     private static final By ACCOUNTS_AND_LISTS = By.id("nav-link-accountList");
     private static final By WATCHLIST_LINK = By.xpath("//span[normalize-space()='Watchlist']");
     private static final By SIGN_IN_HEADER = By.xpath("//h1[normalize-space()='Sign in or create account']");
-    private static final By AMAZON_CART_IS_EMPTY_HEADER = By.cssSelector(".a-size-large.a-spacing-top-base.sc-your-amazon-cart-is-empty");
     private static final By CART_ICON = By.cssSelector(".nav-cart-icon.nav-sprite");
     private static final By INTERSTITIAL_CONTINUE_BUTTON = By.cssSelector("form[action*='storefront'] input[type='submit'], button[name='continue']");
     private static final By INTERSTITIAL_CONTINUE_SHOPPING = By.xpath("//button[contains(.,'Continue shopping')]");
@@ -26,27 +25,68 @@ public class AmazonHomePage extends BasePage {
     }
 
     private void dismissInterstitialIfPresent() {
-        if (isElementPresent(INTERSTITIAL_HEADER) && isElementPresent(INTERSTITIAL_ANY_CONTINUE)) {
-            log.info("Amazon interstitial (header/button) detected, continuing");
-            click(INTERSTITIAL_ANY_CONTINUE);
+        try {
             waitForPageReady();
-            return;
+
+            // Strategy 1: Check for header + any continue button
+            if (isElementPresent(INTERSTITIAL_HEADER) && isElementPresent(INTERSTITIAL_ANY_CONTINUE)) {
+                log.info("Amazon interstitial (header/button) detected, continuing");
+                tryClickInterstitial(INTERSTITIAL_ANY_CONTINUE);
+                waitForElementToDisappear(INTERSTITIAL_HEADER);
+                waitForPageReady();
+                return;
+            }
+
+            // Strategy 2: Look for form submit button
+            if (isElementPresent(INTERSTITIAL_CONTINUE_BUTTON)) {
+                log.info("Amazon interstitial detected, attempting to continue shopping");
+                tryClickInterstitial(INTERSTITIAL_CONTINUE_BUTTON);
+                waitForPageReady();
+                return;
+            }
+
+            // Strategy 3: Look for "Continue shopping" button
+            if (isElementPresent(INTERSTITIAL_CONTINUE_SHOPPING)) {
+                log.info("Amazon interstitial (button) detected, attempting to continue shopping");
+                tryClickInterstitial(INTERSTITIAL_CONTINUE_SHOPPING);
+                waitForPageReady();
+            }
+        } catch (Exception e) {
+            log.warn("Failed to dismiss interstitial: {}", e.getMessage());
         }
-        if (isElementPresent(INTERSTITIAL_CONTINUE_BUTTON)) {
-            log.info("Amazon interstitial detected, attempting to continue shopping");
-            click(INTERSTITIAL_CONTINUE_BUTTON);
-            waitForPageReady();
-        } else if (isElementPresent(INTERSTITIAL_CONTINUE_SHOPPING)) {
-            log.info("Amazon interstitial (button) detected, attempting to continue shopping");
-            click(INTERSTITIAL_CONTINUE_SHOPPING);
-            waitForPageReady();
+    }
+
+    private void tryClickInterstitial(By locator) {
+        try {
+
+            // Try JS click first (more reliable for interstitials)
+            jsClick(locator);
+            log.info("Successfully clicked interstitial with JS");
+        } catch (Exception e) {
+            log.warn("JS click failed, trying regular click: {}", e.getMessage());
+            try {
+                // Fallback to safe click
+                safeClick(locator);
+                log.info("Successfully clicked interstitial with safe click");
+            } catch (Exception ex) {
+                log.warn("Both click methods failed: {}", ex.getMessage());
+            }
         }
     }
 
     public AmazonProductResultsPage searchFor(String query) {
+        // Check if search bar is already visible
         if (!isElementPresent(SEARCH_BAR)) {
+            log.info("Search bar not present, attempting to dismiss interstitial");
             dismissInterstitialIfPresent();
+
+            // Double-check after dismissal with proper wait
+            if (!isElementPresent(SEARCH_BAR)) {
+                log.warn("Search bar still not present after interstitial dismissal, waiting for page ready...");
+                waitForPageReady();
+            }
         }
+
         WebElement searchBar = find(SEARCH_BAR);
         type(SEARCH_BAR, query);
         searchBar.sendKeys(Keys.ENTER);
@@ -68,9 +108,19 @@ public class AmazonHomePage extends BasePage {
 
     public AmazonCartPage openCartInNewWindow() {
         String parentWindow = driver.getWindowHandle();
+
+        // Check if cart icon is visible
         if (!isElementPresent(CART_ICON)) {
+            log.info("Cart icon not present, attempting to dismiss interstitial");
             dismissInterstitialIfPresent();
+
+            // Double-check after dismissal with proper wait
+            if (!isElementPresent(CART_ICON)) {
+                log.warn("Cart icon still not present after interstitial dismissal, waiting for page ready...");
+                waitForPageReady();
+            }
         }
+
         openLinkInNewTab(CART_ICON);
         switchToNewChildWindow();
         return new AmazonCartPage(driver, waitHelper, parentWindow);
