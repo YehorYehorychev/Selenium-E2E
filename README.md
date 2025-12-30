@@ -1,35 +1,15 @@
-# Selenium X Cucumber Framework 2026
+# 🚀 Selenium E2E Automation Framework
 
-## Repository Branches
+## 🎯 Two Approaches, One Framework
 
-This repository maintains two parallel implementations:
+This repository showcases **two parallel test automation implementations** using the same infrastructure:
 
-### 🌿 **`main` branch** - TestNG Framework
-Traditional TestNG-based automation framework with:
-- Direct TestNG test classes with `@Test` annotations
-- TestNG data providers for parameterization
-- TestNG suite XML files for execution control
-- Page Object Model with direct method calls from tests
+| Branch | Approach | Best For |
+|--------|----------|----------|
+| **`main`** | **TestNG** - Traditional test classes | Technical teams, fast development |
+| **`cucumber`** | **BDD/Gherkin** - Business-readable scenarios | Cross-functional teams, living documentation |
 
-### 🥒 **`cucumber` branch** - Cucumber BDD Framework
-Behavior-Driven Development implementation with:
-- **Gherkin feature files** (`.feature`) with Given-When-Then scenarios
-- **Step definitions** mapping Gherkin steps to Java code
-- **Scenario context** for sharing state between steps
-- **Examples tables** for data-driven scenarios
-- **Cucumber TestNG runner** for execution
-- Same Page Objects, helpers, and infrastructure as `main`
-
-**Choose the branch based on your preference:**
-- Use **`main`** for traditional TestNG approach with programmatic test definitions
-- Use **`cucumber`** for BDD style with business-readable Gherkin scenarios
-
-Both branches share:
-- ✅ Same tech stack (Selenium, Allure, Docker, Jenkins)
-- ✅ Same Page Object Model
-- ✅ Same helper utilities (WaitHelper, ScreenshotHelper, etc.)
-- ✅ Same CI/CD setup (Jenkinsfile, docker-compose.yml)
-- ✅ Same configuration management (config.properties)
+**🔥 Key Point:** Both branches share the **same Page Objects, helpers, and CI/CD** - only the test layer differs!
 
 ---
 
